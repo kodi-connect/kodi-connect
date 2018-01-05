@@ -165,12 +165,10 @@ app.post('/login', wrapAsync(async (req, res) => {
   return res.redirect(`${path}?${queryString}`);
 }));
 
-if (process.env.NODE_ENV === 'development') {
-  app.get('/redirect_uri', (req, res) => {
-    console.log('REDIRECT_URI', req.query);
-    res.send('OK');
-  });
-}
+app.get('/redirect_uri', (req, res) => {
+  console.log('REDIRECT_URI', req.query);
+  res.send('OK');
+});
 
 app.get('/kodi/discovery', app.oauth.authenticate(), wrapAsync(async (req, res) => {
   const username = _.get(res, 'locals.oauth.token.user.username');
