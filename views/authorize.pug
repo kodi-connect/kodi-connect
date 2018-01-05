@@ -1,0 +1,13 @@
+html
+  head
+    title Kodi Connect Authorize
+  body
+    h1 Kodi Connect Authorize
+      form(method='POST' action='/oauth/authorize')
+        input(type='hidden' name='client_id' value=client_id)
+        input(type='hidden' name='redirect_uri' value=redirect_uri)
+        input(type='hidden' name='state' value=state)
+        input(type='hidden' name='response_type' value=response_type)
+        button.btn.btn-primary(type='submit' name='allow') Allow
+        button.btn.btn-primary(type='submit' name='deny') Deny
+        button.btn.btn-primary(type='submit' name='logout') Logout

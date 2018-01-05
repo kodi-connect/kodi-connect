@@ -1,0 +1,45 @@
+{
+  "name": "kodi-connect",
+  "version": "1.0.0",
+  "description": "Kodi connect",
+  "main": "index.js",
+  "author": "Tomas Kislan",
+  "license": "MIT",
+  "scripts": {
+    "watch:build": "babel src -d build --copy-files --watch --source-maps inline",
+    "watch:run": "wait-on build/index.js && nodemon --delay 1 build/index.js",
+    "watch": "npm-run-all --parallel watch:*",
+    "build": "babel src -d build --copy-files --source-maps inline",
+    "start": "node build/index.js",
+    "test:lint": "eslint src",
+    "test:flow": "flow src",
+    "test": "npm-run-all --sequential test:*"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "connect-mongo": "^2.0.0",
+    "express": "^4.16.2",
+    "express-oauth-server": "^2.0.0",
+    "express-session": "^1.15.6",
+    "lodash": "^4.17.4",
+    "mongoose": "^5.0.0-rc0",
+    "pug": "^2.0.0-rc.4",
+    "uuid": "^3.1.0",
+    "ws": "^3.3.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.1.2",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.14.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-flowtype": "^2.40.1",
+    "eslint-plugin-import": "^2.8.0",
+    "flow-bin": "^0.62.0",
+    "nodemon": "^1.14.5",
+    "npm-run-all": "^4.1.2",
+    "wait-on": "^2.0.2"
+  }
+}
