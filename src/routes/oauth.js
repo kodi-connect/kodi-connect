@@ -41,7 +41,7 @@ export default function createOAuthRouter(oauth: Object) {
     next();
   }));
 
-  router.post('/authorize', router.oauth.authorize({
+  router.post('/authorize', oauth.authorize({
     authenticateHandler: {
       handle: (req) => {
         console.log('Returning user:', req.session.user);
