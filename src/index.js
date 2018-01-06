@@ -173,7 +173,7 @@ app.get('/redirect_uri', (req, res) => {
 app.get('/kodi/discovery', app.oauth.authenticate(), wrapAsync(async (req, res) => {
   const username = _.get(res, 'locals.oauth.token.user.username');
 
-  const devices = await getDevices(username);
+  const devices = _.pick(await getDevices(username), ['id', 'name']);
   console.log('Devices:', devices);
   res.json(devices);
 }));

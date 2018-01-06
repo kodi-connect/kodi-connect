@@ -19,22 +19,23 @@ export function getUser(username: string, password: string) {
   return UsersModel.findOne({ username, password }).lean();
 }
 
-export async function getDevice(username: string, secret: string) {
-  const user = await UsersModel.findOne({ username, 'devices.secret': secret }).lean();
-  if (!user) return null;
-
-  const device = user.devices.find(d => d.secret === secret);
-
-  return device && device.id;
-}
-
 export async function getDevices(username: string) {
   const user = await UsersModel.findOne({ username }).lean();
   return _.get(user, 'devices');
 }
 
+export async function getDevice(username: string, secret: string) {
+  const devices = await getDevices(username);
+  if (!devices) return null;
+
+  const device = devices.find(d => d.secret === secret);
+
+  return device && device.id;
+}
+
 export async function isUsersDevice(username: string, id: string) {
   const devices = await getDevices(username);
+  if (!devices) return false;
 
   const device = devices.find(d => d.id === id);
 
