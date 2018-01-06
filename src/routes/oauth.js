@@ -2,7 +2,7 @@
 
 import qs from 'querystring';
 import { Router } from 'express';
-import { wrapAsync } from '../utils';
+import { wrapAsync, wrapAsyncMiddleware } from '../utils';
 
 export default function createOAuthRouter(oauth: Object) {
   const router = new Router({ mergeParams: true });
@@ -29,7 +29,7 @@ export default function createOAuthRouter(oauth: Object) {
     res.render('authorize', req.query);
   }));
 
-  router.post('/authorize', wrapAsync(async (req, res, next) => {
+  router.post('/authorize', wrapAsyncMiddleware(async (req, res, next) => {
     console.log('AUTHORIZE POST', req.body);
 
     if (req.body.logout !== undefined) {
