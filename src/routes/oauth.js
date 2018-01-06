@@ -13,11 +13,12 @@ export default function createOAuthRouter(oauth: Object) {
   // Get authorization.
   router.get('/authorize', wrapAsync(async (req, res) => {
     console.log('AUTHORIZE GET', req.query);
+    console.log('AUTHORIZE GET path', req);
 
     // Redirect anonymous users to login page.
     if (!req.session.user) {
       const queryString = qs.stringify({
-        redirect: req.path,
+        redirect: req.originalUrl,
         ...req.query,
       });
       res.redirect(`/login?${queryString}`);

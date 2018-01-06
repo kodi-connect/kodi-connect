@@ -12,7 +12,7 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
   router.get('/discovery', oauth.authenticate(), wrapAsync(async (req, res) => {
     const username = _.get(res, 'locals.oauth.token.user.username');
 
-    const devices = _.pick(await getDevices(username), ['id', 'name']);
+    const devices = (await getDevices(username)).map(d => _.pick(d, ['id', 'name']));
     console.log('Devices:', devices);
     res.json(devices);
   }));
