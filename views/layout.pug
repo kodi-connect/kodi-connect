@@ -1,0 +1,11 @@
+html
+  head
+    block head
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    link(href='https://unpkg.com/normalize.css@^4.1.1' rel='stylesheet')
+    link(href='https://unpkg.com/@blueprintjs/core@^1.11.0/dist/blueprint.css' rel='stylesheet')
+    link(href='/static/styles/app.css' rel='stylesheet')
+  body
+    div.main-content
+      div.inner-content.pt-card.pt-elevation-2
+        block content

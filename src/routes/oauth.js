@@ -13,21 +13,21 @@ export default function createOAuthRouter(oauth: Object) {
   // Get authorization.
   router.get('/authorize', wrapAsync(async (req, res) => {
     console.log('AUTHORIZE GET', req.query);
-    console.log('AUTHORIZE GET path', req);
 
     // Redirect anonymous users to login page.
     if (!req.session.user) {
       const queryString = qs.stringify({
-        redirect: req.originalUrl,
+        redirect: `${req.baseUrl}${req.path}`,
         ...req.query,
       });
       res.redirect(`/login?${queryString}`);
       return;
     }
 
-    console.log('User logged in:', req.session.user);
-
-    res.render('authorize', req.query);
+    res.render('authorize', {
+      ...req.query,
+      username: req.session.user.username,
+    });
   }));
 
   router.post('/authorize', wrapAsyncMiddleware(async (req, res, next) => {
@@ -45,7 +45,6 @@ export default function createOAuthRouter(oauth: Object) {
   router.post('/authorize', oauth.authorize({
     authenticateHandler: {
       handle: (req) => {
-        console.log('Returning user:', req.session.user);
         return req.session.user ? { username: req.session.user.username } : null;
       },
     },

@@ -1,0 +1,26 @@
+extends layout.pug
+
+block head
+  title Devices
+
+block content
+  h1 Devices
+  table.pt-table
+    thead
+      tr
+        th Name
+        th Secret
+        th Actions
+    tbody
+      for device in devices
+        include device.pug
+
+  div.pt-card
+    p Add device
+    div
+      form(method='POST' action='/device/add')
+        input.pt-input(type='text' id='name' placeholder='Device name' name='name' value='')
+        button.pt-button(type='submit' name='add') Add
+
+  form(method='POST' action='/logout')
+    button.pt-button(type='submit' name='logout') Logout

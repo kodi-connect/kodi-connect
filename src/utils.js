@@ -15,10 +15,6 @@ export function wrapAsync(handler: Function) {
       () => {
         if (timedOut) return;
         clearTimeout(timerId);
-        if (!res.finished) {
-          console.error(`${req.path} did not close response`);
-          res.end();
-        }
       },
       (error) => {
         console.error(error);
@@ -36,7 +32,7 @@ export function wrapAsyncMiddleware(handler: Function) {
 
     let timedOut = false;
 
-    // TODO - wrap next function to track that either next was called, of res is finished
+    // TODO - wrap next function to track that next was called
     const timerId = setTimeout(() => {
       timedOut = true;
       res.status(500).json({ error: 'Timed out' });
