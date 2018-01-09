@@ -9,7 +9,8 @@ body {
   flex-grow: 1;
   align-items: center;
   justify-content: center;
-  min-width: 80%;
+  /* min-width: 80%; */
+  min-width: 300px;
   max-width: 90%;
 }
 
@@ -18,4 +19,25 @@ body {
   flex-direction: column;
   flex-grow: 1;
   justify-content: center;
+}
+
+.home-container {
+  display: flex;
+  flex-grow: 0;
+}
+
+.home-container > * {
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+.authorize-container .button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.authorize-container .button-container > button {
+  margin-right: 5px;
+  margin-left: 5px;
 }

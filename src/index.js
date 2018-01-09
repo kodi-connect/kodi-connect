@@ -85,7 +85,7 @@ app.post('/login', wrapAsync(async (req, res) => {
   const user = await getUser(req.body.email, req.body.password);
   if (!user) {
     // TODO - render login error message
-    res.render('login', _.pick(req.body, oauthFields)); // TODO - change this to use pick instead of omit !!!
+    res.render('login', _.pick(req.body, oauthFields));
     return;
   }
 
@@ -97,7 +97,7 @@ app.post('/login', wrapAsync(async (req, res) => {
 
   console.log('Redirecting to:', path);
 
-  const queryString = qs.stringify(_.pick(req.body, oauthFields)); // TODO - change this to use pick instead of omit !!!
+  const queryString = qs.stringify(_.pick(req.body, oauthFields));
 
   res.redirect(`${path}?${queryString}`);
 }));
@@ -124,30 +124,36 @@ function validatePassword(password: string) {
 app.post('/register', wrapAsync(async (req, res) => {
   console.log('REGISTER');
   console.log(req.body);
-  if (!req.body
-    || !req.body.email || !req.body.password
-    || !validateEmail(req.body.email) || !validatePassword(req.body.password)
+
+  const { email, password, repeatPassword } = (req.body || {});
+
+  if (!email || !password || !repeatPassword
+    || !validateEmail(email) || !validatePassword(password) || !validatePassword(repeatPassword)
+    || password != repeatPassword
   ) {
-    // TODO - render register error
-    res.render('login', _.omit(req.body, ['email', 'password']));
+    res.render('register', { error: 'Invalid values' });
     return;
   }
 
-  const created = await createUser(req.body.email, req.body.password);
-  if (created.error) {
-    // TODO - render register error
-    res.render('register', { error: created.error });
-    return;
-  }
+  const result = await createUser(req.body.email, req.body.password);
 
-  res.render('check-email');
+  switch (result) {
+    case 'created':
+      res.render('check-email');
+      break;
+    case 'email_duplicity':
+      res.render('register', { error: 'Email duplicity' });
+      break;
+    default:
+      throw new Error(`Unknown RegistrationResult: ${result}`);
+  }
 }));
 
 app.get('/confirm/:confirmationToken', wrapAsync(async (req, res) => {
-  const status = await confirmUserRegistration(req.params.confirmationToken);
-  console.log('status:', status);
+  const result = await confirmUserRegistration(req.params.confirmationToken);
+  console.log('result:', result);
 
-  switch (status) {
+  switch (result) {
     case 'confirmed':
       res.render('confirmed');
       break;
@@ -158,7 +164,7 @@ app.get('/confirm/:confirmationToken', wrapAsync(async (req, res) => {
       res.sendStatus(400);
       break;
     default:
-      throw new Error('Unknown ConfirmationResult');
+      throw new Error(`Unknown ConfirmationResult: ${result}`);
   }
 }));
 

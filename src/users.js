@@ -6,6 +6,7 @@ import randtoken from 'rand-token';
 import nodemailer from 'nodemailer';
 import uuid from 'uuid/v4';
 
+type RegistrationResult = 'created' | 'email_duplicity';
 type ConfirmationResult = 'confirmed' | 'already_confirmed' | 'not_found';
 
 const hostUrl = process.env.HOST_URL || (process.env.NODE_ENV === 'development' && 'http://localhost:3005');
@@ -18,18 +19,22 @@ if (!emailPassword) throw new Error('EMAIL_PASSWORD not defined');
 const confirmationTokenLenght = 48;
 const kodiDeviceTokenLength = 12;
 
-mongoose.model('Users', new Schema({
-  username: { type: String },
+const UserSchema = new Schema({
+  username: { type: String, unique: true },
   password: { type: String },
   createdAt: { type: Date },
   activated: { type: Boolean },
   confirmationToken: { type: String },
   devices: [new Schema({
-    id: { type: String },
+    id: { type: String, unique: true },
     name: { type: String },
     secret: { type: String },
   })],
-}));
+});
+
+UserSchema.index({ username: 1, 'devices.name': 1 }, { unique: true });
+
+mongoose.model('Users', UserSchema);
 
 const UsersModel = mongoose.model('Users');
 
@@ -46,8 +51,8 @@ function sendConfirmationEmail(username: string, confirmationToken: string) {
     const mailOptions = {
       from: 'kodi.connect.server@gmail.com',
       to: username,
-      subject: 'Confirm account', // Subject line
-      html: `<p>Click <a href="${hostUrl}/confirm/${confirmationToken}">here</a></p>`,
+      subject: 'Kodi Connect - Confirm account', // Subject line
+      html: `<p>To confirm Kodi Connect registration, click <a href="${hostUrl}/confirm/${confirmationToken}">here</a></p>`,
     };
 
     mailSender.sendMail(mailOptions, (error, info) => {
@@ -61,7 +66,7 @@ export function getUser(username: string, password: string) {
   return UsersModel.findOne({ username, password, activated: true }).lean();
 }
 
-export async function createUser(username: string, password: string) {
+export async function createUser(username: string, password: string): Promise<RegistrationResult> {
   const confirmationToken = randtoken.generate(confirmationTokenLenght);
 
   const newUser = new UsersModel({
@@ -72,9 +77,19 @@ export async function createUser(username: string, password: string) {
     confirmationToken,
   });
 
-  await newUser.save();
+  try {
+    await newUser.save();
+  } catch (error) {
+    if (error.code === 11000) {
+      return 'email_duplicity';
+    }
+
+    throw error;
+  }
 
   await sendConfirmationEmail(username, confirmationToken);
+
+  return 'created';
 }
 
 export async function confirmUserRegistration(confirmationToken: string): Promise<ConfirmationResult> {

@@ -26,6 +26,12 @@ export default function createTunnelServer(server: Object): Object {
             return;
           }
 
+          if (kodiInstances[deviceId]) {
+            console.log(`Device ${deviceId} already connected, closing socket`);
+            ws.close();
+            return;
+          }
+
           kodiInstances[deviceId] = {
             rpc: createTunnel(ws),
             close: () => ws.close(),

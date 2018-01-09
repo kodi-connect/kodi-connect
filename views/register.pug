@@ -1,10 +1,10 @@
 extends layout.pug
 
 block head
-  title Kodi Connect Register
+  title Kodi Connect - Register
 
 block content
-  h1 Kodi Connect Register
+  h1 Register
   form(method='POST' action='/register')
     div.pt-form-group.pt-inline
       div.pt-form-content
@@ -16,6 +16,11 @@ block content
         div.pt-input-group
           span.pt-icon.pt-icon-key
           input.pt-input(type='password' id='password' placeholder='Password' name='password' value='')
+    div.pt-form-group.pt-inline
+      div.pt-form-content
+        div.pt-input-group
+          span.pt-icon.pt-icon-key
+          input.pt-input(type='password' id='repeatPassword' placeholder='Repeat Password' name='repeatPassword' value='')
     button.pt-button(type='submit') Register
 
   a(href="/login") Login
