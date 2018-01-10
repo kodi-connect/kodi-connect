@@ -129,7 +129,7 @@ app.post('/register', wrapAsync(async (req, res) => {
 
   if (!email || !password || !repeatPassword
     || !validateEmail(email) || !validatePassword(password) || !validatePassword(repeatPassword)
-    || password != repeatPassword
+    || password !== repeatPassword
   ) {
     res.render('register', { error: 'Invalid values' });
     return;
