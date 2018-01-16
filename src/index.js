@@ -14,7 +14,7 @@ import { getUser, createUser, confirmUserRegistration, getDevices, removeDevice,
 import { wrapAsync } from './utils';
 import oauthRouter from './routes/oauth';
 import kodiRouter from './routes/kodi';
-import tunnelServer from './tunnel-server';
+import createTunnelServer from './tunnel-server';
 
 const MongoStore = connectMongo(session);
 
@@ -38,7 +38,7 @@ const server = http.createServer(app);
 
 app.use('/static', express.static('static'));
 
-const kodiInstances = tunnelServer(server);
+const kodiInstances = createTunnelServer(server, '/ws');
 
 app.set('view engine', 'pug');
 
