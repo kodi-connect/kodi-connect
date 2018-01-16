@@ -1,5 +1,7 @@
 /* @flow */
 
+import _ from 'lodash';
+
 export function wrapAsync(handler: Function) {
   return (req: Object, res: Object) => {
     const p = handler(req, res);
@@ -51,4 +53,14 @@ export function wrapAsyncMiddleware(handler: Function) {
       },
     );
   };
+}
+
+export function parseAuthorizationHeader(req: Object): { username?: string, secret?: string } {
+  const authRegex = /Basic (.*)/;
+  const match = _.get(req, 'headers.authorization', '').match(authRegex);
+  if (!match) return {};
+  const auth = Buffer.from(match[1], 'base64').toString();
+
+  const [username, secret] = auth.split(':');
+  return { username, secret };
 }

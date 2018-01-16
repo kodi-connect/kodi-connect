@@ -4,6 +4,7 @@ import { Server as WsServer } from 'ws';
 
 import createTunnel from './tunnel';
 import { getDevice } from './users';
+import { parseAuthorizationHeader } from './utils';
 
 export default function createTunnelServer(server: Object, path: string): Object {
   const kodiInstances: Object = {};
@@ -17,16 +18,12 @@ export default function createTunnelServer(server: Object, path: string): Object
       console.log('kodi disconnected', code, reason);
     });
 
-    const authRegex = /Basic (.*)/;
-    const match = req.headers.authorization.match(authRegex);
-    if (!match) {
+    const { username, secret } = parseAuthorizationHeader(req);
+    if (!username || !secret) {
       console.log('Invalid Authorization header');
       ws.close();
       return;
     }
-    const auth = Buffer.from(match[1], 'base64').toString();
-
-    const [username, secret] = auth.split(':');
 
     getDevice(username, secret).then((deviceId) => {
       console.log('Device found:', deviceId);
