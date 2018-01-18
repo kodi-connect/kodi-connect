@@ -19,6 +19,7 @@ export default function createTunnelServer(server: Object, path: string): Object
     });
 
     const { username, secret } = parseAuthorizationHeader(req);
+    console.log('Kodi device connecting:', username, secret);
     if (!username || !secret) {
       console.log('Invalid Authorization header');
       ws.close();
