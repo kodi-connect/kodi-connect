@@ -27,7 +27,8 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
 
     const validDevice = await isUsersDevice(username, req.body.id);
     if (!validDevice) {
-      res.sendStatus(401);
+      console.warn('Not a users device:', username, req.body.id);
+      res.sendStatus(400);
       return;
     }
 
