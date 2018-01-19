@@ -5,7 +5,7 @@ import mongoose, { Schema } from 'mongoose';
 import randtoken from 'rand-token';
 import nodemailer from 'nodemailer';
 import uuid from 'uuid/v4';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 
 type RegistrationResult = 'created' | 'email_duplicity';
 type ConfirmationResult = 'confirmed' | 'already_confirmed' | 'not_found';
