@@ -6,6 +6,10 @@
 
 import mongoose, { Schema } from 'mongoose';
 
+import createLogger from './logging';
+
+const logger = createLogger('oauth-model');
+
 /**
  * Schema definitions.
  */
@@ -43,9 +47,9 @@ const OAuthAuthorizationCodeModel = mongoose.model('OAuthAuthorizationCode');
 
 export async function getAccessToken(bearerToken: string) {
   // Adding `.lean()`, as we get a mongoose wrapper object back from `findOne(...)`, and oauth2-server complains.
-  console.log('getAccessToken', bearerToken);
+  logger.debug('getAccessToken', { bearerToken });
   const data = await OAuthTokensModel.findOne({ accessToken: bearerToken }).lean();
-  console.log('getAccessToken', data);
+  logger.debug('getAccessToken', { data });
 
   return data;
 }
@@ -58,7 +62,7 @@ const customRedirectUris = (process.env.CUSTOM_REDIRECT_URI && [process.env.CUST
 
 export async function getClient(clientId: string, clientSecret: string) {
   // return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
-  console.log('getClient:', clientId, clientSecret);
+  logger.debug('getClient', { clientId, clientSecret });
   return {
     id: 'abcdefghijklmnopqrstuvwxyz',
     grants: ['authorization_code', 'refresh_token'],
@@ -80,7 +84,7 @@ export async function getRefreshToken(refreshToken: string) {
 }
 
 export async function saveAuthorizationCode(code: Object, client: Object, user: Object) {
-  console.log('saveAuthorizationCode', code, client, user);
+  logger.debug('saveAuthorizationCode', { code, client, user });
 
   const authCode = new OAuthAuthorizationCodeModel({
     code: code.authorizationCode,
@@ -93,7 +97,7 @@ export async function saveAuthorizationCode(code: Object, client: Object, user: 
 
   const data = await authCode.save();
 
-  console.log('saveAuthorizationCode', data);
+  logger.debug('saveAuthorizationCode', { data });
 
   return {
     ...data,
@@ -102,14 +106,14 @@ export async function saveAuthorizationCode(code: Object, client: Object, user: 
 }
 
 export async function getAuthorizationCode(code: string) {
-  console.log('getAuthorizationCode', code);
+  logger.debug('getAuthorizationCode', { code });
   const data = await OAuthAuthorizationCodeModel.findOne({ code }).lean();
-  console.log('getAuthorizationCode', data);
+  logger.debug('getAuthorizationCode', { data });
   return data;
 }
 
 export async function revokeAuthorizationCode({ code }: { code: string}) {
-  console.log('revokeAuthorizationCode', code);
+  logger.debug('revokeAuthorizationCode', { code });
   await OAuthAuthorizationCodeModel.findOneAndRemove({ code }).lean();
   return true;
 }
@@ -119,7 +123,7 @@ export async function revokeAuthorizationCode({ code }: { code: string}) {
  */
 
 export async function saveToken(token: Object, client: Object, user: Object) {
-  console.log('saveToken', token, client, user);
+  logger.debug('saveToken', { token, client, user });
   const accessToken = new OAuthTokensModel({
     ...token,
     client,
@@ -128,7 +132,7 @@ export async function saveToken(token: Object, client: Object, user: Object) {
 
   const data = await accessToken.save();
 
-  console.log('saveToken', data);
+  logger.debug('saveToken', { data });
 
   return data;
 }

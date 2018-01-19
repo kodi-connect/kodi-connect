@@ -2,6 +2,10 @@
 
 import _ from 'lodash';
 
+import createLogger from './logging';
+
+const logger = createLogger('utils');
+
 export function wrapAsync(handler: Function) {
   return (req: Object, res: Object) => {
     const p = handler(req, res);
@@ -19,7 +23,7 @@ export function wrapAsync(handler: Function) {
         clearTimeout(timerId);
       },
       (error) => {
-        console.error(error);
+        logger.error('Request failed', { error });
         if (timedOut) return;
         clearTimeout(timerId);
         res.status(500).json({ error: error.message });
@@ -46,7 +50,7 @@ export function wrapAsyncMiddleware(handler: Function) {
         clearTimeout(timerId);
       },
       (error) => {
-        console.error(error);
+        logger.error('Request middleware failed', { error });
         if (timedOut) return;
         clearTimeout(timerId);
         res.status(500).json({ error: error.message });

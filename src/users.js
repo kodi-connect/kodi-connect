@@ -7,6 +7,10 @@ import nodemailer from 'nodemailer';
 import uuid from 'uuid/v4';
 import bcrypt from 'bcryptjs';
 
+import createLogger from './logging';
+
+const logger = createLogger('users');
+
 type RegistrationResult = 'created' | 'email_duplicity';
 type ConfirmationResult = 'confirmed' | 'already_confirmed' | 'not_found';
 
@@ -86,7 +90,7 @@ export async function createUser(username: string, password: string): Promise<Re
   try {
     await newUser.save();
   } catch (error) {
-    console.warn(error);
+    logger.warn('Failed to create user', { error });
     if (error.code === 11000) {
       return 'email_duplicity';
     }
@@ -125,10 +129,10 @@ export async function getDevice(username: string, secret: string) {
   return device && device.id;
 }
 
-export async function addDevice(username: string, name: string): Promise<{ error?: string, devices?: Object[] }> {
+export async function addDevice(username: string, name: string): Promise<{| errorMessage?: string, devices?: Object[] |}> {
   const user = await UsersModel.findOne({ username, activated: true });
 
-  if (user.devices.find(d => d.name === name)) return { error: 'name_duplicity' };
+  if (user.devices.find(d => d.name === name)) return { errorMessage: 'name_duplicity' };
 
   const id = uuid();
   const secret = randtoken.generate(kodiDeviceTokenLength);

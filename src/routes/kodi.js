@@ -5,6 +5,9 @@ import { Router } from 'express';
 
 import { getDevices, isUsersDevice } from '../users';
 import { wrapAsync } from '../utils';
+import createLogger from '../logging';
+
+const logger = createLogger('routes/kodi');
 
 export default function createOAuthRouter(oauth: Object, kodiInstances: Object) {
   const router = new Router({ mergeParams: true });
@@ -13,7 +16,7 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
     const username = _.get(res, 'locals.oauth.token.user.username');
 
     const devices = (await getDevices(username)).map(d => _.pick(d, ['id', 'name']));
-    console.log('Devices:', devices);
+    logger.info('Devices', { username, devices });
     res.json(devices);
   }));
 
@@ -27,7 +30,7 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
 
     const validDevice = await isUsersDevice(username, req.body.id);
     if (!validDevice) {
-      console.warn('Not a users device:', username, req.body.id);
+      logger.warn('Not a users device:', { username, id: req.body.id });
       res.sendStatus(400);
       return;
     }
@@ -37,11 +40,10 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
       return;
     }
 
-    console.log('Sending message to kodi:');
-    console.log(req.body.rpc);
+    logger.info('Sending message to kodi', { rpc: req.body.rpc });
 
     const rpcRes = await kodiInstances[req.body.id].rpc(req.body.rpc);
-    console.log('rpcRes:', rpcRes);
+    logger.info('Response message from kodi', { rpc: rpcRes });
     res.json(rpcRes);
   }));
 

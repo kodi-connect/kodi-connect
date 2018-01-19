@@ -15,6 +15,9 @@ import { wrapAsync } from './utils';
 import oauthRouter from './routes/oauth';
 import kodiRouter from './routes/kodi';
 import createTunnelServer from './tunnel-server';
+import createLogger from './logging';
+
+const logger = createLogger('index');
 
 const MongoStore = connectMongo(session);
 
@@ -27,9 +30,9 @@ if (!sessionSecret) throw new Error('SESSION_SECRET not defined');
 
 mongoose.connect(mongoConnectString, (error) => {
   if (error) {
-    console.log('ERROR connecting to MongoDB', error);
+    logger.error('ERROR connecting to MongoDB', { error });
   } else {
-    console.log('Successfully connected to MongoDB');
+    logger.info('Successfully connected to MongoDB');
   }
 });
 
@@ -77,7 +80,7 @@ function isLoggedInMiddleware(shouldBeLoggedIn: boolean) {
 }
 
 app.get('/login', isLoggedInMiddleware(false), wrapAsync(async (req, res) => {
-  console.log('LOGIN', req.query);
+  logger.info('LOGIN', req.query);
   res.render('login', req.query);
 }));
 
@@ -88,13 +91,13 @@ app.post('/login', wrapAsync(async (req, res) => {
     return;
   }
 
-  console.log('User:', user);
+  logger.info('User:', { user });
 
   req.session.user = user;
 
   const path = req.body.redirect || '/';
 
-  console.log('Redirecting to:', path);
+  logger.info('Redirecting', { path });
 
   const queryString = qs.stringify(_.pick(req.body, oauthFields));
 
@@ -121,8 +124,7 @@ function validatePassword(password: string) {
 }
 
 app.post('/register', wrapAsync(async (req, res) => {
-  console.log('REGISTER');
-  console.log(req.body);
+  logger.info('Registering user', { email: req.body && req.body.email });
 
   const { email, password, repeatPassword } = (req.body || {});
 
@@ -141,7 +143,7 @@ app.post('/register', wrapAsync(async (req, res) => {
       res.render('check-email');
       break;
     case 'email_duplicity':
-      console.log('Email duplicity');
+      logger.info('Email duplicity', { email: req.body.email });
       res.render('register', { error: 'Email duplicity' });
       break;
     default:
@@ -151,7 +153,7 @@ app.post('/register', wrapAsync(async (req, res) => {
 
 app.get('/confirm/:confirmationToken', wrapAsync(async (req, res) => {
   const result = await confirmUserRegistration(req.params.confirmationToken);
-  console.log('result:', result);
+  logger.info('User registration confirmation', { confirmationToken: req.params.confirmationToken, result });
 
   switch (result) {
     case 'confirmed':
@@ -180,11 +182,11 @@ app.post('/device/add', isLoggedInMiddleware(true), wrapAsync(async (req, res) =
     return;
   }
 
-  const { devices, error } = await addDevice(req.session.user.username, req.body.name);
+  const { devices, errorMessage } = await addDevice(req.session.user.username, req.body.name);
 
-  if (error) {
-    console.log('Failed to add device:', error);
-    res.render('devices', { error });
+  if (errorMessage) {
+    logger.info('Failed to add device', { errorMessage });
+    res.render('devices', { error: errorMessage });
     return;
   }
 
@@ -205,5 +207,5 @@ app.get('/', wrapAsync(async (req, res) => {
 }));
 
 server.listen(3005, undefined, undefined, () => {
-  console.log('Listening on %d', server.address().port);
+  logger.info('Server listening', { port: server.address().port });
 });

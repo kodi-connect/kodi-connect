@@ -2,6 +2,10 @@
 
 import uuid from 'uuid/v4';
 
+import createLogger from './logging';
+
+const logger = createLogger('tunnel');
+
 export default function createTunnel(ws: any) {
   const rpcMsgs = {};
 
@@ -32,15 +36,15 @@ export default function createTunnel(ws: any) {
 
     if (msg.ping === 'pong') return;
 
-    console.log('Received command:', msg);
+    logger.info('Received command', { msg });
 
     if (!msg || !msg.correlationId || !msg.data) {
-      console.log('Invalid message');
+      logger.warn('Invalid message', { msg });
       ws.close();
       return;
     }
     if (!rpcMsgs[msg.correlationId]) {
-      console.log('Correlation id not found');
+      logger.warn('Correlation id not found', { correlationId: msg.correlationId });
       ws.close();
       return;
     }

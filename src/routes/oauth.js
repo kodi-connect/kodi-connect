@@ -3,6 +3,9 @@
 import qs from 'querystring';
 import { Router } from 'express';
 import { wrapAsync, wrapAsyncMiddleware } from '../utils';
+import createLogger from '../logging';
+
+const logger = createLogger('routes/oauth');
 
 export default function createOAuthRouter(oauth: Object) {
   const router = new Router({ mergeParams: true });
@@ -12,7 +15,7 @@ export default function createOAuthRouter(oauth: Object) {
 
   // Get authorization.
   router.get('/authorize', wrapAsync(async (req, res) => {
-    console.log('AUTHORIZE GET', req.query);
+    logger.debug('Authorize page', req.query);
 
     // Redirect anonymous users to login page.
     if (!req.session.user) {
@@ -31,7 +34,7 @@ export default function createOAuthRouter(oauth: Object) {
   }));
 
   router.post('/authorize', wrapAsyncMiddleware(async (req, res, next) => {
-    console.log('AUTHORIZE POST', req.body);
+    logger.debug('Authorize request', req.body);
 
     if (req.body.logout !== undefined) {
       req.session.user = undefined;
@@ -51,7 +54,6 @@ export default function createOAuthRouter(oauth: Object) {
   }));
 
   router.get('/redirect_uri', (req, res) => {
-    console.log('REDIRECT_URI', req.query);
     res.send('OK');
   });
 
