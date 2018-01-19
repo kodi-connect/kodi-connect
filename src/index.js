@@ -176,7 +176,7 @@ app.get('/devices', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
 
 app.post('/device/add', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
   if (!req.body.name) {
-    res.redirect('/devices', { error: 'Device name missing' });
+    res.render('devices', { error: 'Device name missing' });
     return;
   }
 
@@ -184,7 +184,7 @@ app.post('/device/add', isLoggedInMiddleware(true), wrapAsync(async (req, res) =
 
   if (error) {
     console.log('Failed to add device:', error);
-    res.redirect('/devices', { error });
+    res.render('devices', { error });
     return;
   }
 
