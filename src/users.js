@@ -5,7 +5,7 @@ import mongoose, { Schema } from 'mongoose';
 import randtoken from 'rand-token';
 import nodemailer from 'nodemailer';
 import uuid from 'uuid/v4';
-// import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 type RegistrationResult = 'created' | 'email_duplicity';
 type ConfirmationResult = 'confirmed' | 'already_confirmed' | 'not_found';
@@ -65,16 +65,14 @@ function sendConfirmationEmail(username: string, confirmationToken: string) {
 
 export async function getUser(username: string, password: string) {
   const user = await UsersModel.findOne({ username, activated: true }).lean();
-  // const isPasswordCorrect = await bcrypt.compare(password, user.password);
-  const isPasswordCorrect = password === user.password;
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
   return isPasswordCorrect && user;
 }
 
 export async function createUser(username: string, password: string): Promise<RegistrationResult> {
   const confirmationToken = randtoken.generate(confirmationTokenLenght);
 
-  // const hashedPassword = await bcrypt.hash(password, 10);
-  const hashedPassword = password;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = new UsersModel({
     username,
