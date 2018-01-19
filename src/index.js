@@ -84,8 +84,7 @@ app.get('/login', isLoggedInMiddleware(false), wrapAsync(async (req, res) => {
 app.post('/login', wrapAsync(async (req, res) => {
   const user = await getUser(req.body.email, req.body.password);
   if (!user) {
-    // TODO - render login error message
-    res.render('login', _.pick(req.body, oauthFields));
+    res.render('login', { ..._.pick(req.body, oauthFields), error: 'Failed to log in' });
     return;
   }
 
@@ -142,6 +141,7 @@ app.post('/register', wrapAsync(async (req, res) => {
       res.render('check-email');
       break;
     case 'email_duplicity':
+      console.log('Email duplicity');
       res.render('register', { error: 'Email duplicity' });
       break;
     default:
@@ -176,8 +176,7 @@ app.get('/devices', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
 
 app.post('/device/add', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
   if (!req.body.name) {
-    console.log('name missing');
-    res.redirect('/devices'); // TODO - render 'devices' with error
+    res.redirect('/devices', { error: 'Device name missing' });
     return;
   }
 
@@ -185,7 +184,7 @@ app.post('/device/add', isLoggedInMiddleware(true), wrapAsync(async (req, res) =
 
   if (error) {
     console.log('Failed to add device:', error);
-    res.redirect('/devices'); // TODO - render 'devices' with error
+    res.redirect('/devices', { error });
     return;
   }
 

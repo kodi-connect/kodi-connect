@@ -80,6 +80,7 @@ export async function createUser(username: string, password: string): Promise<Re
   try {
     await newUser.save();
   } catch (error) {
+    console.warn(error);
     if (error.code === 11000) {
       return 'email_duplicity';
     }

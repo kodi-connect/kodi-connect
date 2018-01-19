@@ -5,6 +5,8 @@ block head
 
 block content
   h1 Devices
+  if error
+    p Error: #{error}
   table.pt-table
     thead
       tr

@@ -5,6 +5,8 @@ block head
 
 block content
   h1 Register
+  if error
+    p Error: #{error}
   form(method='POST' action='/register')
     div.pt-form-group.pt-inline
       div.pt-form-content
