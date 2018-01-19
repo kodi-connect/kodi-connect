@@ -5,6 +5,7 @@ import mongoose, { Schema } from 'mongoose';
 import randtoken from 'rand-token';
 import nodemailer from 'nodemailer';
 import uuid from 'uuid/v4';
+import bcrypt from 'bcrypt';
 
 type RegistrationResult = 'created' | 'email_duplicity';
 type ConfirmationResult = 'confirmed' | 'already_confirmed' | 'not_found';
@@ -20,13 +21,13 @@ const confirmationTokenLenght = 48;
 const kodiDeviceTokenLength = 12;
 
 const UserSchema = new Schema({
-  username: { type: String, unique: true },
-  password: { type: String },
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   createdAt: { type: Date },
   activated: { type: Boolean },
   confirmationToken: { type: String },
   devices: [new Schema({
-    id: { type: String, unique: true },
+    id: { type: String },
     name: { type: String },
     secret: { type: String },
   })],
@@ -62,16 +63,20 @@ function sendConfirmationEmail(username: string, confirmationToken: string) {
   });
 }
 
-export function getUser(username: string, password: string) {
-  return UsersModel.findOne({ username, password, activated: true }).lean();
+export async function getUser(username: string, password: string) {
+  const user = await UsersModel.findOne({ username, activated: true }).lean();
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  return isPasswordCorrect && user;
 }
 
 export async function createUser(username: string, password: string): Promise<RegistrationResult> {
   const confirmationToken = randtoken.generate(confirmationTokenLenght);
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const newUser = new UsersModel({
     username,
-    password,
+    password: hashedPassword,
     createdAt: new Date(),
     activated: false,
     confirmationToken,
