@@ -65,6 +65,7 @@ function sendConfirmationEmail(username: string, confirmationToken: string) {
 
 export async function getUser(username: string, password: string) {
   const user = await UsersModel.findOne({ username, activated: true }).lean();
+  if (!user) return null;
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
   return isPasswordCorrect && user;
 }
