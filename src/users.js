@@ -65,14 +65,16 @@ function sendConfirmationEmail(username: string, confirmationToken: string) {
 
 export async function getUser(username: string, password: string) {
   const user = await UsersModel.findOne({ username, activated: true }).lean();
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  // const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  const isPasswordCorrect = password === user.password;
   return isPasswordCorrect && user;
 }
 
 export async function createUser(username: string, password: string): Promise<RegistrationResult> {
   const confirmationToken = randtoken.generate(confirmationTokenLenght);
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = password;
 
   const newUser = new UsersModel({
     username,
