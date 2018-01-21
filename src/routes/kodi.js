@@ -40,10 +40,10 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
       return;
     }
 
-    logger.info('Sending message to kodi', { rpc: req.body.rpc });
+    logger.info('Sending message to kodi', { id: req.body.id, rpc: req.body.rpc });
 
     const rpcRes = await kodiInstances[req.body.id].rpc(req.body.rpc);
-    logger.info('Response message from kodi', { rpc: rpcRes });
+    logger.info('Response message from kodi', { id: req.body.id, rpc: rpcRes });
     res.json(rpcRes);
   }));
 

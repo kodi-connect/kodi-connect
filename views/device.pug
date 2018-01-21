@@ -1,6 +1,6 @@
 tr.device-row
   td= device.name
-  td= device.secret
+  td(style='font-family: monospace;')= device.secret
   td
     form(method='POST' action='/device/remove/' + device.id)
       button.pt-button.pt-minimal.pt-icon-trash(type='submit' name='remove')

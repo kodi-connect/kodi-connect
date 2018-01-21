@@ -54,6 +54,15 @@ app.use(session({
   resave: false,
 }));
 
+app.use((req, res, next) => {
+  if (req.session.errorMessage) {
+    _.set(res, 'locals.app.errorMessage', req.session.errorMessage);
+    req.session.errorMessage = undefined;
+  }
+
+  next();
+});
+
 app.oauth = new OAuthServer({
   model: OAuthModel,
   debug: process.env.NODE_ENV === 'development',
@@ -81,7 +90,7 @@ function isLoggedInMiddleware(shouldBeLoggedIn: boolean) {
 
 app.get('/login', isLoggedInMiddleware(false), wrapAsync(async (req, res) => {
   logger.info('LOGIN', req.query);
-  res.render('login', req.query);
+  res.render('login', { ...req.query, error: _.get(res, 'locals.app.errorMessage') });
 }));
 
 app.post('/login', wrapAsync(async (req, res) => {
@@ -110,7 +119,7 @@ app.post('/logout', wrapAsync(async (req, res) => {
 }));
 
 app.get('/register', isLoggedInMiddleware(false), wrapAsync(async (req, res) => {
-  res.render('register');
+  res.render('register', { error: _.get(res, 'locals.app.errorMessage') });
 }));
 
 function validateEmail(email: string) {
@@ -132,7 +141,8 @@ app.post('/register', wrapAsync(async (req, res) => {
     || !validateEmail(email) || !validatePassword(password) || !validatePassword(repeatPassword)
     || password !== repeatPassword
   ) {
-    res.render('register', { error: 'Invalid values' });
+    req.session.errorMessage = 'Invalid values';
+    res.redirect('/register');
     return;
   }
 
@@ -144,7 +154,8 @@ app.post('/register', wrapAsync(async (req, res) => {
       break;
     case 'email_duplicity':
       logger.info('Email duplicity', { email: req.body.email });
-      res.render('register', { error: 'Email duplicity' });
+      req.session.errorMessage = 'Email duplicity';
+      res.redirect('/register');
       break;
     default:
       throw new Error(`Unknown RegistrationResult: ${result}`);
@@ -173,29 +184,31 @@ app.get('/confirm/:confirmationToken', wrapAsync(async (req, res) => {
 app.get('/devices', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
   const devices = await getDevices(req.session.user.username);
 
-  res.render('devices', { devices });
+  res.render('devices', { devices, error: _.get(res, 'locals.app.errorMessage') });
 }));
 
 app.post('/device/add', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
   if (!req.body.name) {
-    res.render('devices', { error: 'Device name missing' });
+    req.session.errorMessage = 'Device name missing';
+    res.redirect('/devices');
     return;
   }
 
-  const { devices, errorMessage } = await addDevice(req.session.user.username, req.body.name);
+  const { errorMessage } = await addDevice(req.session.user.username, req.body.name);
 
   if (errorMessage) {
     logger.info('Failed to add device', { errorMessage });
-    res.render('devices', { error: errorMessage });
+    req.session.errorMessage = errorMessage;
+    res.redirect('/devices');
     return;
   }
 
-  res.render('devices', { devices });
+  res.redirect('/devices');
 }));
 
 app.post('/device/remove/:id', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
-  const devices = await removeDevice(req.session.user.username, req.params.id);
-  res.render('devices', { devices });
+  await removeDevice(req.session.user.username, req.params.id);
+  res.redirect('/devices');
 }));
 
 app.get('/', wrapAsync(async (req, res) => {
