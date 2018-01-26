@@ -28,15 +28,15 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
       return;
     }
 
+    if (!kodiInstances[req.body.id]) {
+      res.json({ status: 'error', error: 'device_unreachable' });
+      return;
+    }
+
     const validDevice = await isUsersDevice(username, req.body.id);
     if (!validDevice) {
       logger.warn('Not a users device:', { username, id: req.body.id });
       res.sendStatus(400);
-      return;
-    }
-
-    if (!kodiInstances[req.body.id]) {
-      res.sendStatus(404);
       return;
     }
 
