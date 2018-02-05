@@ -9,6 +9,20 @@ import createLogger from '../logging';
 
 const logger = createLogger('routes/kodi');
 
+const LEGACY_CAPABILITIES = [
+  {
+    interface: 'Alexa.RemoteVideoPlayer',
+    type: 'AlexaInterface',
+    version: '3',
+  },
+  {
+    interface: 'Alexa.PlaybackController',
+    version: '3',
+    type: 'AlexaInterface',
+    supportedOperations: ['Play', 'Pause', 'Stop'],
+  },
+];
+
 export default function createOAuthRouter(oauth: Object, kodiInstances: Object) {
   const router = new Router({ mergeParams: true });
 
@@ -17,7 +31,20 @@ export default function createOAuthRouter(oauth: Object, kodiInstances: Object) 
 
     const devices = (await getDevices(username)).map(d => _.pick(d, ['id', 'name']));
     logger.info('Devices', { username, devices });
-    res.json(devices);
+
+    const connectedDevices = devices.filter(device => kodiInstances[device.id]);
+
+    const devicesWithCapabilities = await Promise.all(connectedDevices.map(async (device) => {
+      try {
+        const { capabilities } = await kodiInstances[device.id].rpc({ type: 'capabilities' });
+        return { ...device, capabilities: capabilities || LEGACY_CAPABILITIES };
+      } catch (error) {
+        logger.error('Failed to get capabilities', { error, device });
+        return { ...device, capabilities: LEGACY_CAPABILITIES };
+      }
+    }));
+
+    res.json(devicesWithCapabilities);
   }));
 
   router.post('/rpc', oauth.authenticate(), wrapAsync(async (req, res) => {
