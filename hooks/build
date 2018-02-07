@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker build --build-arg GIT_HASH="$(git rev-parse HEAD)" -t ${IMAGE_NAME}:${DOCKER_TAG} .

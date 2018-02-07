@@ -1,5 +1,9 @@
 FROM node:8.9.4-alpine
 
+ARG GIT_HASH
+LABEL githash=${GIT_HASH}
+
+ENV GIT_HASH=${GIT_HASH}
 ENV HOME=/home/node
 
 WORKDIR $HOME/app
