@@ -23,5 +23,5 @@ jobs:
             - node_modules
 
       - run:
-          name: Run tests
-          command: yarn test
+          name: Run eslint, yarn, and tests
+          command: yarn test:unit
