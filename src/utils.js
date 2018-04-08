@@ -60,7 +60,7 @@ export function wrapAsyncMiddleware(handler: Function) {
 }
 
 export function parseAuthorizationHeader(req: Object): { username?: string, secret?: string } {
-  const authRegex = /Basic (.+:.+)/;
+  const authRegex = /Basic (.*)/;
   const match = _.get(req, 'headers.authorization', '').match(authRegex);
   if (!match) return {};
   const auth = Buffer.from(match[1], 'base64').toString();
