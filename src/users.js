@@ -117,7 +117,7 @@ export async function confirmUserRegistration(confirmationToken: string): Promis
 
 export async function getDevices(username: string) {
   const user = await UsersModel.findOne({ username, activated: true }).lean();
-  return _.get(user, 'devices');
+  return _.get(user, 'devices') || [];
 }
 
 export async function getDevice(username: string, secret: string) {
@@ -129,7 +129,7 @@ export async function getDevice(username: string, secret: string) {
   return device && device.id;
 }
 
-export async function addDevice(username: string, name: string): Promise<{| errorMessage?: string, devices?: Object[] |}> {
+export async function addDevice(username: string, name: string): Promise<{ errorMessage?: string, devices?: Object[] }> {
   const user = await UsersModel.findOne({ username, activated: true });
 
   if (user.devices.find(d => d.name === name)) return { errorMessage: 'name_duplicity' };

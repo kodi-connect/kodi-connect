@@ -94,7 +94,17 @@ app.get('/login', isLoggedInMiddleware(false), wrapAsync(async (req, res) => {
 }));
 
 app.post('/login', wrapAsync(async (req, res) => {
-  const user = await getUser(req.body.email, req.body.password);
+  const username = req.body.email && req.body.email.toLowerCase();
+  const { password } = req.body;
+
+  if (!username || !password) {
+    req.session.errorMessage = 'Missing username and/or password';
+    const queryString = qs.stringify(_.pick(req.body, oauthFields));
+    res.redirect(`/login?${queryString}`);
+    return;
+  }
+
+  const user = await getUser(username, password);
   if (!user) {
     res.render('login', { ..._.pick(req.body, oauthFields), error: 'Failed to log in' });
     return;
@@ -133,9 +143,10 @@ function validatePassword(password: string) {
 }
 
 app.post('/register', wrapAsync(async (req, res) => {
-  logger.info('Registering user', { email: req.body && req.body.email });
+  logger.info('Registering user', { email: req.body.email });
 
-  const { email, password, repeatPassword } = (req.body || {});
+  const email = req.body.email && req.body.email.toLowerCase();
+  const { password, repeatPassword } = req.body;
 
   if (!email || !password || !repeatPassword
     || !validateEmail(email) || !validatePassword(password) || !validatePassword(repeatPassword)
@@ -146,14 +157,14 @@ app.post('/register', wrapAsync(async (req, res) => {
     return;
   }
 
-  const result = await createUser(req.body.email, req.body.password);
+  const result = await createUser(email, password);
 
   switch (result) {
     case 'created':
       res.render('check-email');
       break;
     case 'email_duplicity':
-      logger.info('Email duplicity', { email: req.body.email });
+      logger.info('Email duplicity', { email });
       req.session.errorMessage = 'Email duplicity';
       res.redirect('/register');
       break;
