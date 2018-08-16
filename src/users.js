@@ -75,7 +75,7 @@ export async function getUser(username: string, password: string) {
 }
 
 export async function createUser(username: string, password: string): Promise<RegistrationResult> {
-  const confirmationToken = randtoken.generate(confirmationTokenLenght);
+  const confirmationToken = randtoken.generate(confirmationTokenLenght, 'abcdefghjkmnpqrstuvwxyz23456789');
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
