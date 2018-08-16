@@ -75,7 +75,7 @@ export async function getUser(username: string, password: string) {
 }
 
 export async function createUser(username: string, password: string): Promise<RegistrationResult> {
-  const confirmationToken = randtoken.generate(confirmationTokenLenght, 'abcdefghjkmnpqrstuvwxyz23456789');
+  const confirmationToken = randtoken.generate(confirmationTokenLenght);
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -135,7 +135,7 @@ export async function addDevice(username: string, name: string): Promise<{ error
   if (user.devices.find(d => d.name === name)) return { errorMessage: 'name_duplicity' };
 
   const id = uuid();
-  const secret = randtoken.generate(kodiDeviceTokenLength);
+  const secret = randtoken.generate(kodiDeviceTokenLength, 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789');
   const updatedDevices = [...user.devices, { id, name, secret }];
   user.devices = updatedDevices;
 
