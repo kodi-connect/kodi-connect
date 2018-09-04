@@ -4,8 +4,6 @@ import util from 'util';
 
 import bugsnag from 'bugsnag';
 
-import config from './config';
-
 type LoggerFunctionType = (message: string, data?: Object) => void;
 
 type LoggerType = {
@@ -16,11 +14,6 @@ type LoggerType = {
 };
 
 type SeverityType = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR';
-
-bugsnag.register(config.bugsnag.key, {
-  notifyReleaseStages: ['production'],
-  releaseStage: 'production',
-});
 
 const severities: SeverityType[] = [
   'DEBUG',

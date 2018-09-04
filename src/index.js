@@ -9,6 +9,7 @@ import session from 'express-session';
 import OAuthServer from 'express-oauth-server';
 import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
+import bugsnag from 'bugsnag';
 import * as OAuthModel from './oauth-model';
 import { getUser, createUser, confirmUserRegistration, getDevices, removeDevice, addDevice } from './users';
 import { wrapAsync } from './util/api';
@@ -16,6 +17,7 @@ import oauthRouter from './routes/oauth';
 import kodiRouter from './routes/kodi';
 import alexaRouter from './routes/alexa';
 import createTunnelServer from './tunnel-server';
+import config from './config';
 import createLogger from './logging';
 
 const logger = createLogger('index');
@@ -35,6 +37,11 @@ mongoose.connect(mongoConnectString, (error) => {
   } else {
     logger.info('Successfully connected to MongoDB');
   }
+});
+
+bugsnag.register(config.bugsnag.key, {
+  notifyReleaseStages: ['production'],
+  releaseStage: 'production',
 });
 
 const app = express();
