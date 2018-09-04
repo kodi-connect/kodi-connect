@@ -24,7 +24,7 @@ jobs:
 
       - run:
           name: Install flow typed
-          commmand: yarn flowtyped
+          command: yarn flowtyped
 
       - run:
           name: Run eslint, yarn, and tests
