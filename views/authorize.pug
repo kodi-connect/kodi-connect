@@ -9,6 +9,7 @@ block content
   div.authorize-container
     form(method='POST' action='/oauth/authorize')
       input(type='hidden' name='client_id' value=client_id)
+      input(type='hidden' name='client_secret' value=client_secret)
       input(type='hidden' name='redirect_uri' value=redirect_uri)
       input(type='hidden' name='state' value=state)
       input(type='hidden' name='response_type' value=response_type)

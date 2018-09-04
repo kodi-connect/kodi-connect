@@ -1,4 +1,6 @@
-import { parseAuthorizationHeader } from '../utils';
+// @flow
+
+import { parseAuthorizationHeader } from '../util/api';
 
 function createReqWithAuthorization(username, password) {
   const usernamePassword = `${username}:${password}`;
@@ -9,7 +11,7 @@ function createReqWithAuthorization(username, password) {
 test('Test authorization header parsing', () => {
   const usernamePasswordPairs = [
     ['test', 'test'],
-    ['somename@somedomain.net', 'NoOneWillGuessThisWithspecial***$@']
+    ['somename@somedomain.net', 'NoOneWillGuessThisWithspecial***$@'],
   ];
 
   for (const [inUsername, inPassword] of usernamePasswordPairs) {

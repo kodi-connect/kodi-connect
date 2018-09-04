@@ -2,6 +2,10 @@
 
 import util from 'util';
 
+import bugsnag from 'bugsnag';
+
+import config from './config';
+
 type LoggerFunctionType = (message: string, data?: Object) => void;
 
 type LoggerType = {
@@ -12,6 +16,11 @@ type LoggerType = {
 };
 
 type SeverityType = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR';
+
+bugsnag.register(config.bugsnag.key, {
+  notifyReleaseStages: ['production'],
+  releaseStage: 'production',
+});
 
 const severities: SeverityType[] = [
   'DEBUG',
@@ -28,11 +37,23 @@ function getEnvLogLevel(): SeverityType {
   return 'DEBUG';
 }
 
+function logBugsnag(severity: SeverityType, message: string, data: Object): void {
+  if (process.env.NODE_ENV !== 'production') return;
+
+  bugsnag.notify(message, {
+    severity: severity.toLowerCase(),
+    data,
+  }, (error) => {
+    // eslint-disable-next-line no-console
+    if (error) console.error(`Bugsnag notify failed ${error.message}`);
+  });
+}
+
 const logLevel: SeverityType = getEnvLogLevel();
 const configuredSeverityIndex = severities.indexOf(logLevel);
 
 function createLogFn(level: SeverityType, moduleName: string): LoggerFunctionType {
-  if (severities.indexOf(level) < configuredSeverityIndex) return () => {};
+  if (severities.indexOf(level) < configuredSeverityIndex) return () => { };
 
   return (message: string, data: Object = {}): void => {
     const dataMessage = [
@@ -50,6 +71,10 @@ function createLogFn(level: SeverityType, moduleName: string): LoggerFunctionTyp
 
     // eslint-disable-next-line no-console
     console.log(`${dataMessage} ${message}`.replace(/\n/g, ' '));
+
+    if (level === 'ERROR') {
+      logBugsnag(level, message, data);
+    }
   };
 }
 

@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Router } from 'express';
 
 import { getDevices, isUsersDevice } from '../users';
-import { wrapAsync } from '../utils';
+import { wrapAsync } from '../util/api';
 import createLogger from '../logging';
 
 const logger = createLogger('routes/kodi');
@@ -23,7 +23,7 @@ const LEGACY_CAPABILITIES = [
   },
 ];
 
-export default function createOAuthRouter(oauth: Object, kodiInstances: Object) {
+export default function createKodiRouter(oauth: Object, kodiInstances: Object) {
   const router = new Router({ mergeParams: true });
 
   router.get('/discovery', oauth.authenticate(), wrapAsync(async (req, res) => {

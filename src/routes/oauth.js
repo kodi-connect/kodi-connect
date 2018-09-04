@@ -2,7 +2,7 @@
 
 import qs from 'querystring';
 import { Router } from 'express';
-import { wrapAsync, wrapAsyncMiddleware } from '../utils';
+import { wrapAsync, wrapAsyncMiddleware } from '../util/api';
 import createLogger from '../logging';
 
 const logger = createLogger('routes/oauth');

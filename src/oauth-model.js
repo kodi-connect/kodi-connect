@@ -8,6 +8,8 @@ import mongoose, { Schema } from 'mongoose';
 
 import createLogger from './logging';
 
+export { getUser } from './users';
+
 const logger = createLogger('oauth-model');
 
 /**
@@ -63,7 +65,8 @@ const customRedirectUris = (process.env.CUSTOM_REDIRECT_URI && [process.env.CUST
 export async function getClient(clientId: string, clientSecret: string) {
   // return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
   logger.debug('getClient', { clientId, clientSecret });
-  return {
+
+  const client = {
     id: 'abcdefghijklmnopqrstuvwxyz',
     grants: ['authorization_code', 'refresh_token'],
     redirectUris: [
@@ -73,6 +76,15 @@ export async function getClient(clientId: string, clientSecret: string) {
       ...customRedirectUris,
     ],
   };
+
+  if (process.env.NODE_ENV === 'development') {
+    return {
+      ...client,
+      grants: [...client.grants, 'password'],
+    };
+  }
+
+  return client;
 }
 
 /**
@@ -112,7 +124,7 @@ export async function getAuthorizationCode(code: string) {
   return data;
 }
 
-export async function revokeAuthorizationCode({ code }: { code: string}) {
+export async function revokeAuthorizationCode({ code }: { code: string }) {
   logger.debug('revokeAuthorizationCode', { code });
   await OAuthAuthorizationCodeModel.findOneAndRemove({ code }).lean();
   return true;

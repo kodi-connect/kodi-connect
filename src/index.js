@@ -11,9 +11,10 @@ import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import * as OAuthModel from './oauth-model';
 import { getUser, createUser, confirmUserRegistration, getDevices, removeDevice, addDevice } from './users';
-import { wrapAsync } from './utils';
+import { wrapAsync } from './util/api';
 import oauthRouter from './routes/oauth';
 import kodiRouter from './routes/kodi';
+import alexaRouter from './routes/alexa';
 import createTunnelServer from './tunnel-server';
 import createLogger from './logging';
 
@@ -21,7 +22,7 @@ const logger = createLogger('index');
 
 const MongoStore = connectMongo(session);
 
-const oauthFields = ['state', 'response_type', 'redirect', 'client_id', 'redirect_uri'];
+const oauthFields = ['state', 'response_type', 'redirect', 'client_id', 'client_secret', 'redirect_uri'];
 
 const mongoConnectString = process.env.MONGO_URL;
 if (!mongoConnectString) throw new Error('MONGO_URL not defined');
@@ -73,6 +74,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/oauth', oauthRouter(app.oauth));
 app.use('/kodi', kodiRouter(app.oauth, kodiInstances));
+app.use('/alexa', alexaRouter(app.oauth));
 
 function isLoggedIn(req) {
   return !!req.session.user;

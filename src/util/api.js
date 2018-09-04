@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 
-import createLogger from './logging';
+import createLogger from '../logging';
 
 const logger = createLogger('utils');
 

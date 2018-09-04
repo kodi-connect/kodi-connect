@@ -4,7 +4,7 @@ import { Server as WsServer } from 'ws';
 
 import createTunnel from './tunnel';
 import { getDevice } from './users';
-import { parseAuthorizationHeader } from './utils';
+import { parseAuthorizationHeader } from './util/api';
 import createLogger from './logging';
 
 const logger = createLogger('tunnel-server');
@@ -19,6 +19,10 @@ export default function createTunnelServer(server: Object, path: string): Object
 
     ws.on('close', (code, reason) => {
       logger.debug('kodi disconnected', { code, reason });
+    });
+
+    ws.on('error', (error) => {
+      logger.debug('Websocket error', { error });
     });
 
     const { username, secret } = parseAuthorizationHeader(req);
@@ -43,7 +47,7 @@ export default function createTunnelServer(server: Object, path: string): Object
       }
 
       kodiInstances[deviceId] = {
-        rpc: createTunnel(ws),
+        rpc: createTunnel(username, deviceId, ws),
         close: () => ws.close(),
       };
 

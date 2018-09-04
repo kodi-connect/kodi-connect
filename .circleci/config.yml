@@ -23,5 +23,9 @@ jobs:
             - node_modules
 
       - run:
+          name: Install flow typed
+          commmand: yarn flowtyped
+
+      - run:
           name: Run eslint, yarn, and tests
           command: yarn test:unit
