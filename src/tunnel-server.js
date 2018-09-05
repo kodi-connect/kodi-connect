@@ -28,20 +28,20 @@ export default function createTunnelServer(server: Object, path: string): Object
     const { username, secret } = parseAuthorizationHeader(req);
     logger.info('Kodi device connecting:', { username, secret });
     if (!username || !secret) {
-      logger.warn('Invalid Authorization header');
+      logger.warn('Invalid Authorization header', { username, secret });
       ws.close();
       return;
     }
 
     getDevice(username, secret).then((deviceId) => {
-      logger.info('Device found', { deviceId });
+      logger.info('Device found', { username, deviceId });
       if (!deviceId) {
         ws.close();
         return;
       }
 
       if (kodiInstances[deviceId]) {
-        logger.warn('Device already connected, closing socket', { deviceId });
+        logger.warn('Device already connected, closing socket', { username, deviceId });
         ws.close();
         return;
       }
@@ -53,7 +53,7 @@ export default function createTunnelServer(server: Object, path: string): Object
 
       ws.on('close', () => { delete kodiInstances[deviceId]; });
     }, (error) => {
-      logger.error('Failed to get device', { error });
+      logger.error('Failed to get device', { username, error });
       ws.close();
     });
   });

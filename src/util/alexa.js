@@ -130,8 +130,16 @@ export async function sendAlexaEvent(region: AwsRegion, event: Object) {
       data: event,
     });
   } catch (error) {
-    // TODO - user error log once submited, currently it's failing all the time, and would spam Bugsnag
-    logger.warn('Failed to send alexa event', { error, data: error.response && error.response.data });
+    // TODO - use error log once submited, currently it's failing all the time, and would spam Bugsnag
+    logger.warn(
+      'Failed to send alexa event',
+      {
+        error,
+        data: error.response && error.response.data,
+        region,
+        event,
+      },
+    );
     return;
   }
 

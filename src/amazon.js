@@ -16,7 +16,7 @@ const logger = createLogger('amazon');
 async function accessTokenRequest(region: AwsRegion, request: AccessTokenRequest): Promise<AmazonTokens> {
   const currentTime = Date.now();
 
-  logger.debug('Requesting access tokens', { request });
+  logger.debug('Requesting access tokens', { region, request });
 
   let response;
   try {
@@ -30,7 +30,15 @@ async function accessTokenRequest(region: AwsRegion, request: AccessTokenRequest
       },
     });
   } catch (error) {
-    logger.error('Failed to get amazon tokens', { error, data: error.response && error.response.data });
+    logger.error(
+      'Failed to get amazon tokens',
+      {
+        error,
+        data: error.response && error.response.data,
+        region,
+        request,
+      },
+    );
     throw new Error(stringifyError(error) || error.message);
   }
 
