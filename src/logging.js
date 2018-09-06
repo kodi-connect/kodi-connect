@@ -33,12 +33,17 @@ function getEnvLogLevel(): SeverityType {
 function logBugsnag(severity: SeverityType, message: string, data: Object): void {
   if (process.env.NODE_ENV !== 'production') return;
 
-  bugsnag.notify(message, {
+  const { error, err, ...restData } = data;
+
+  bugsnag.notify(error || err || message, {
     severity: severity.toLowerCase(),
-    data,
-  }, (error) => {
+    data: {
+      ...restData,
+      message,
+    },
+  }, (e) => {
     // eslint-disable-next-line no-console
-    if (error) console.error(`Bugsnag notify failed ${error.message}`);
+    if (e) console.error(`Bugsnag notify failed ${e.message}`);
   });
 }
 
