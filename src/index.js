@@ -154,8 +154,9 @@ function validatePassword(password: string) {
 app.post('/register', wrapAsync(async (req, res) => {
   logger.info('Registering user', { email: req.body.email });
 
-  const email = req.body.email && req.body.email.toLowerCase();
-  const { password, repeatPassword } = req.body;
+  const email = req.body.email && req.body.email.toLowerCase().trim();
+  const password = req.body.password && req.body.password.trim();
+  const repeatPassword = req.body.repeatPassword && req.body.repeatPassword.trim();
 
   if (!email || !password || !repeatPassword
     || !validateEmail(email) || !validatePassword(password) || !validatePassword(repeatPassword)
