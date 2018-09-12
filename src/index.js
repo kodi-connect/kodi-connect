@@ -232,6 +232,14 @@ app.post('/device/remove/:id', isLoggedInMiddleware(true), wrapAsync(async (req,
   res.redirect('/devices');
 }));
 
+app.get('/terms-of-use/alexa', wrapAsync(async (req, res) => {
+  res.render('alexa-terms-of-use', { hostname: req.hostname });
+}));
+
+app.get('/privacy-policy/alexa', wrapAsync(async (req, res) => {
+  res.render('alexa-privacy-policy', { hostname: req.hostname });
+}));
+
 app.get('/', wrapAsync(async (req, res) => {
   if (!isLoggedIn(req)) {
     res.render('home');
