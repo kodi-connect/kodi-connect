@@ -7,6 +7,14 @@ import asyncMessageHandler from './async-message-handler';
 
 const logger = createLogger('tunnel');
 
+const RPC_TIMEOUT = 60 * 1000; // 60 seconds
+
+export class RpcTimeoutError extends Error {
+  constructor() {
+    super('RPC Timeout');
+  }
+}
+
 export default function createTunnel(username: string, deviceId: string, ws: any) {
   const rpcMsgs = {};
 
@@ -16,7 +24,7 @@ export default function createTunnel(username: string, deviceId: string, ws: any
     let cb;
 
     const p: Promise<Object> = new Promise((resolve, reject) => {
-      const timeoutId = setTimeout(() => reject(new Error('RPC Timeout')), 60 * 1000);
+      const timeoutId = setTimeout(() => reject(new RpcTimeoutError()), RPC_TIMEOUT);
 
       cb = (responseMessage: Object) => {
         clearTimeout(timeoutId);

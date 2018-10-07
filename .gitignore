@@ -3,4 +3,6 @@
 /.vscode
 /flow-typed
 
+/src/playground.js
+
 .DS_Store

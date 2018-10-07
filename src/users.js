@@ -51,7 +51,7 @@ UserSchema.index({ username: 1, 'devices.name': 1 }, { unique: true });
 
 mongoose.model('Users', UserSchema);
 
-const UsersModel = mongoose.model('Users');
+export const UsersModel = mongoose.model('Users');
 
 const mailSender = nodemailer.createTransport({
   service: 'gmail',

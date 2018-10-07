@@ -5,6 +5,7 @@ import { Router } from 'express';
 
 import { getDevices, isUsersDevice } from '../users';
 import { wrapAsync } from '../util/api';
+import { RpcTimeoutError } from '../tunnel';
 import createLogger from '../logging';
 
 const logger = createLogger('routes/kodi');
@@ -69,9 +70,19 @@ export default function createKodiRouter(oauth: Object, kodiInstances: Object) {
 
     logger.info('Sending message to kodi', { id: req.body.id, rpc: req.body.rpc });
 
-    const rpcRes = await kodiInstances[req.body.id].rpc(req.body.rpc);
-    logger.info('Response message from kodi', { id: req.body.id, rpc: rpcRes });
-    res.json(rpcRes);
+    try {
+      const rpcRes = await kodiInstances[req.body.id].rpc(req.body.rpc);
+      logger.info('Response message from kodi', { id: req.body.id, rpc: rpcRes });
+      res.json(rpcRes);
+    } catch (error) {
+      if (error instanceof RpcTimeoutError) {
+        logger.warn('RPC Timeout', { id: req.body.id, rpc: req.body.rpc });
+        res.sendStatus(504);
+      } else {
+        logger.error('RPC call failed', { error });
+        res.sendStatus(500);
+      }
+    }
   }));
 
   return router;

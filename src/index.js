@@ -13,6 +13,7 @@ import bugsnag from 'bugsnag';
 import * as OAuthModel from './oauth-model';
 import { getUser, createUser, confirmUserRegistration, getDevices, removeDevice, addDevice } from './users';
 import { wrapAsync } from './util/api';
+import { validateEmail } from './util/email';
 import oauthRouter from './routes/oauth';
 import kodiRouter from './routes/kodi';
 import alexaRouter from './routes/alexa';
@@ -140,11 +141,6 @@ app.post('/logout', wrapAsync(async (req, res) => {
 app.get('/register', isLoggedInMiddleware(false), wrapAsync(async (req, res) => {
   res.render('register', { error: _.get(res, 'locals.app.errorMessage') });
 }));
-
-function validateEmail(email: string) {
-  if (email.length === 0) return false;
-  return true;
-}
 
 function validatePassword(password: string) {
   if (password.length === 0) return false;
