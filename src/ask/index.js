@@ -42,6 +42,7 @@ function testerValid(tester: Tester): boolean {
 }
 
 async function getSkillStatus(skillId: string) {
+  logger.info('getSkillStatus', { skillId });
   try {
     const response = await askRequest({
       method: 'GET',
@@ -59,6 +60,7 @@ async function getSkillStatus(skillId: string) {
 }
 
 async function waitForSkillCreation(skillId: string, seconds: number = 5) {
+  logger.info('waitForSkillCreation', { skillId, seconds });
   for (let i = 0; i < seconds; i += 1) {
     await sleep(1000);
     const { status, errors } = await getSkillStatus(skillId);
@@ -80,6 +82,7 @@ async function waitForSkillCreation(skillId: string, seconds: number = 5) {
 }
 
 async function createSkill() {
+  logger.info('createSkill');
   try {
     const response = await askRequest({
       method: 'POST',
@@ -98,6 +101,7 @@ async function createSkill() {
 }
 
 async function updateAccountLinking(skillId: string) {
+  logger.info('updateAccountLinking', { skillId });
   try {
     await askRequest({
       method: 'PUT',
@@ -113,6 +117,7 @@ async function updateAccountLinking(skillId: string) {
 }
 
 export async function deleteSkill(skillId: string) {
+  logger.info('deleteSkill', { skillId });
   try {
     await askRequest({
       method: 'DELETE',
@@ -125,6 +130,7 @@ export async function deleteSkill(skillId: string) {
 }
 
 async function createBetaTest(skillId: string) {
+  logger.info('createBetaTest', { skillId });
   try {
     await askRequest({
       method: 'POST',
@@ -140,6 +146,7 @@ async function createBetaTest(skillId: string) {
 }
 
 async function startBetaTest(skillId: string) {
+  logger.info('startBetaTest', { skillId });
   try {
     await askRequest({
       method: 'POST',
@@ -155,6 +162,7 @@ async function startBetaTest(skillId: string) {
 }
 
 async function endBetaTest(skillId: string) {
+  logger.info('endBetaTest', { skillId });
   try {
     await askRequest({
       method: 'POST',
@@ -167,6 +175,7 @@ async function endBetaTest(skillId: string) {
 }
 
 async function getBetaTest(skillId: string): Promise<BetaTest> {
+  logger.info('getBetaTest', { skillId });
   try {
     const response = await askRequest({
       method: 'GET',
@@ -182,6 +191,7 @@ async function getBetaTest(skillId: string): Promise<BetaTest> {
 }
 
 async function waitForSkillBetaTestStatus(skillId: string, expectedStatus: BetaTestStatus, seconds: number = 30) {
+  logger.info('waitForSkillBetaTestStatus', { skillId, expectedStatus, seconds });
   for (let i = 0; i < seconds; i += 1) {
     await sleep(5000);
     const { status } = await getBetaTest(skillId);
@@ -203,6 +213,7 @@ async function waitForSkillBetaTestStatus(skillId: string, expectedStatus: BetaT
 }
 
 async function waitForSkillBetaTestEnd(skillId: string, seconds: number = 30) {
+  logger.info('waitForSkillBetaTestEnd', { skillId, seconds });
   for (let i = 0; i < seconds; i += 1) {
     await sleep(5000);
 
@@ -219,6 +230,7 @@ async function waitForSkillBetaTestEnd(skillId: string, seconds: number = 30) {
 }
 
 export async function getBetaTestTesters(skillId: string) {
+  logger.info('getBetaTestTesters', { skillId });
   try {
     const response = await askRequest({
       method: 'GET',
@@ -285,6 +297,7 @@ export async function isSkillBetaTestEnding(skillId: string) {
 }
 
 export async function addSkill(): Promise<string> {
+  logger.info('addSkill');
   let skillId;
   try {
     skillId = await createSkill();
@@ -307,6 +320,7 @@ export async function addSkill(): Promise<string> {
 }
 
 export async function restartBetaTest(skillId: string) {
+  logger.info('restartBetaTest', { skillId });
   const { testers } = await getBetaTestTesters(skillId);
   await endBetaTest(skillId);
   await waitForSkillBetaTestEnd(skillId);
@@ -324,6 +338,7 @@ function pickBestAlexaSkill(alexaSkillsWithBetaTests: Object[]) {
 }
 
 async function getBestAlexaSkill(): Promise<{ skillId: string, invitationUrl: string }> {
+  logger.info('getBestAlexaSkill');
   const alexaSkills = await AlexaSkills.getValue([]);
 
   const alexaSkillsWithBetaTests = await Promise.all(alexaSkills.map(async (skillId) => {
@@ -338,6 +353,8 @@ async function getBestAlexaSkill(): Promise<{ skillId: string, invitationUrl: st
     throw new AlexaSkillNotFound();
   }
 
+  logger.info('bestAlexaSkillWithBetaTest', { bestAlexaSkillWithBetaTest });
+
   return {
     skillId: bestAlexaSkillWithBetaTest.skillId,
     invitationUrl: bestAlexaSkillWithBetaTest.betaTest.invitationUrl,
@@ -345,6 +362,7 @@ async function getBestAlexaSkill(): Promise<{ skillId: string, invitationUrl: st
 }
 
 export async function addBetaTester(email: string) {
+  logger.info('addBetaTester', { email });
   const { skillId, invitationUrl } = await getBestAlexaSkill();
 
   await addBetaTesters(skillId, [email]);
@@ -353,10 +371,12 @@ export async function addBetaTester(email: string) {
 }
 
 export async function removeBetaTester(skillId: string, email: string) {
+  logger.info('removeBetaTester', { skillId, email });
   await removeBetaTesters(skillId, [email]);
 }
 
 export async function getAlexaSkillsWithBetaTests(skillIds: string[]) {
+  logger.info('getAlexaSkillsWithBetaTests', { skillIds });
   let skills = [];
 
   for (const skillId of skillIds) {
