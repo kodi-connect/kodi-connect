@@ -1,7 +1,9 @@
 /node_modules
 /build
 /.vscode
+/.idea
 /flow-typed
+/tmp
 
 /src/playground.js
 

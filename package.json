@@ -15,7 +15,8 @@
     "test:lint": "eslint src",
     "test:flow": "flow src",
     "test": "npm-run-all --sequential test:*",
-    "flowtyped": "flow-typed install jest"
+    "flowtyped": "flow-typed install jest",
+    "docker:build": "docker build -f dev.Dockerfile -t kodi-connect/kodi-connect:dev ."
   },
   "dependencies": {
     "axios": "^0.18.0",

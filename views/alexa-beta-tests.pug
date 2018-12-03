@@ -1,0 +1,30 @@
+extends layout.pug
+
+block head
+    title Kodi Connect - Alexa Beta Test
+
+block content
+    h1 Alexa Beta Test
+    if error
+        p Error: #{error}
+
+    table.pt-table
+        thead
+            tr
+                th Email
+                th Invitation Url
+                th Actions
+        tbody
+            for alexaBetaTest in alexaBetaTests
+                include alexa-beta-test.pug
+    div.pt-card
+        p Add Alexa Email
+            div
+                form(method='POST' action='/alexa-beta-tests/add')
+                    input.pt-input(type='text' id='email' placeholder='Email' name='email' value='')
+                    button.pt-button(type='submit' name='add') Add
+
+    a.pt-button(role="button" href='/devices' tabindex="0") Devices
+
+    form(method='POST' action='/logout')
+        button.pt-button(type='submit' name='logout') Logout

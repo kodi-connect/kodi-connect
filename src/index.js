@@ -11,7 +11,18 @@ import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
 import bugsnag from 'bugsnag';
 import * as OAuthModel from './oauth-model';
-import { getUser, createUser, confirmUserRegistration, getDevices, removeDevice, addDevice } from './users';
+import {
+  getUser,
+  createUser,
+  confirmUserRegistration,
+  getDevices,
+  removeDevice,
+  addDevice,
+  UsersModel,
+  addAlexaBetaTest,
+  getAlexaBetaTests,
+  removeAlexaBetaTest
+} from './users';
 import { wrapAsync } from './util/api';
 import { validateEmail } from './util/email';
 import oauthRouter from './routes/oauth';
@@ -20,6 +31,9 @@ import alexaRouter from './routes/alexa';
 import createTunnelServer from './tunnel-server';
 import config from './config';
 import createLogger from './logging';
+import { accessTokenRequest, transformAccessTokenData } from './ask/api';
+import { AlexaSkills, AmazonCredentials } from './params';
+import { addBetaTester, addSkill, deleteSkill, getAlexaSkillsWithBetaTests, removeBetaTester } from './ask';
 
 const logger = createLogger('index');
 
@@ -88,6 +102,10 @@ function isLoggedIn(req) {
   return !!req.session.user;
 }
 
+function isAdmin(req) {
+  return isLoggedIn(req) && req.session.user.admin === true;
+}
+
 function isLoggedInMiddleware(shouldBeLoggedIn: boolean) {
   return (req, res, next) => {
     if (isLoggedIn(req) !== shouldBeLoggedIn) {
@@ -96,6 +114,14 @@ function isLoggedInMiddleware(shouldBeLoggedIn: boolean) {
     }
     next();
   };
+}
+
+function isAdminMiddleware(req, res, next) {
+  if (!isAdmin(req)) {
+    res.redirect('/');
+    return;
+  }
+  next();
 }
 
 app.get('/login', isLoggedInMiddleware(false), wrapAsync(async (req, res) => {
@@ -228,12 +254,120 @@ app.post('/device/remove/:id', isLoggedInMiddleware(true), wrapAsync(async (req,
   res.redirect('/devices');
 }));
 
+app.get('/alexa-beta-tests', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
+  const alexaBetaTests = await getAlexaBetaTests(req.session.user.username);
+
+  res.render(
+    'alexa-beta-tests',
+    {
+      error: _.get(res, 'locals.app.errorMessage'),
+      alexaBetaTests,
+    },
+  );
+}));
+
+app.post('/alexa-beta-tests/add', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
+  const { email } = req.body;
+  if (!email || !validateEmail(email)) {
+    req.session.errorMessage = 'Invalid email';
+    res.redirect('/alexa-beta-tests');
+    return;
+  }
+
+  try {
+    const { skillId, invitationUrl } = await addBetaTester(email);
+
+    await addAlexaBetaTest(req.session.user.username, email, skillId, invitationUrl);
+  } catch (error) {
+    logger.error('Failed to add beta tester', { error });
+    req.session.errorMessage = error.message;
+  }
+
+  res.redirect('/alexa-beta-tests');
+}));
+
+app.post('/alexa-beta-tests/remove/:email', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
+  const { email } = req.params;
+  if (!email || !validateEmail(email)) {
+    req.session.errorMessage = 'Invalid email';
+    res.redirect('/alexa-beta-tests');
+    return;
+  }
+
+  try {
+    const skillId = await removeAlexaBetaTest(req.session.user.username, email);
+    await removeBetaTester(skillId, email);
+  } catch (error) {
+    logger.error('Failed to remove beta tester', { error, email });
+    req.session.errorMessage = error.message;
+  }
+
+  res.redirect('/alexa-beta-tests');
+}));
+
 app.get('/terms-of-use/alexa', wrapAsync(async (req, res) => {
   res.render('alexa-terms-of-use', { hostname: req.hostname });
 }));
 
 app.get('/privacy-policy/alexa', wrapAsync(async (req, res) => {
   res.render('alexa-privacy-policy', { hostname: req.hostname });
+}));
+
+app.get('/admin', isAdminMiddleware, wrapAsync(async (req, res) => {
+  const skillIds = await AlexaSkills.getValue([]);
+  const skills = await getAlexaSkillsWithBetaTests(skillIds);
+  res.render('admin', { skills, error: _.get(res, 'locals.app.errorMessage') });
+}));
+
+app.post('/admin/alexa-skill/add', isAdminMiddleware, wrapAsync(async (req, res) => {
+  let skillId;
+  try {
+    skillId = await addSkill();
+  } catch (error) {
+    req.session.errorMessage = error.message;
+    res.redirect('/admin');
+    return;
+  }
+  const alexaSkills = await AlexaSkills.getValue([]);
+  await AlexaSkills.setValue([...alexaSkills, skillId]);
+
+  logger.info('Added Alexa skill', { skillId });
+
+  res.redirect('/admin');
+}));
+
+app.post('/admin/alexa-skill/remove/:id', isAdminMiddleware, wrapAsync(async (req, res) => {
+  const { id: skillId } = req.params;
+  await deleteSkill(skillId);
+
+  const alexaSkills = await AlexaSkills.getValue([]);
+  await AlexaSkills.setValue(alexaSkills.filter(id => id !== skillId));
+
+  logger.info('Removed Alexa skill', { skillId });
+
+  res.redirect('/admin');
+}));
+
+app.get('/admin/lwa', isAdminMiddleware, wrapAsync(async (req, res) => {
+  const query = qs.stringify({
+    client_id: 'amzn1.application-oa2-client.2f7fd62ac6b1463b85d862a28526f78b',
+    scope: 'alexa::ask:skills:readwrite',
+    response_type: 'code',
+    redirect_uri: 'https://mactunnel.kislan.sk/lwa/redirect_uri',
+  });
+  res.redirect(`https://www.amazon.com/ap/oa?${query}`);
+}));
+
+app.get('/admin/lwa/redirect_uri', isAdminMiddleware, wrapAsync(async (req, res) => {
+  try {
+    const accessTokenData = await accessTokenRequest(req.query.code);
+
+    AmazonCredentials.setValue(transformAccessTokenData(accessTokenData));
+  } catch (error) {
+    logger.error('Failed to get Amazon tokens', { error, responseData: error.response && error.response.data });
+  }
+
+  res.redirect('/');
 }));
 
 app.get('/', wrapAsync(async (req, res) => {

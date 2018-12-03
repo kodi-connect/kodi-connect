@@ -13,7 +13,10 @@
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true, "optionalDependencies": false, "peerDependencies": false }],
     "import/prefer-default-export": 0,
     "no-restricted-syntax": 0,
-    "no-await-in-loop": 0
+    "no-await-in-loop": 0,
+    "no-continue": 0,
+    "no-return-await": 0,
+    "camelcase": 0
   },
   "plugins": [
     "flowtype"
