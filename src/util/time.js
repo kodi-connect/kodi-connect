@@ -1,7 +1,7 @@
 // @flow
 
-export function sleep(time: number) {
-  return new Promise(resolve => setTimeout(() => resolve(), time));
+export function sleep(time: number): Promise<void> {
+  return new Promise(resolve => setTimeout(() => { resolve(); }, time));
 }
 
 export function daysBeforeNow(timestamp: string): number {

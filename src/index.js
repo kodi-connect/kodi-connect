@@ -18,10 +18,9 @@ import {
   getDevices,
   removeDevice,
   addDevice,
-  UsersModel,
   addAlexaBetaTest,
   getAlexaBetaTests,
-  removeAlexaBetaTest
+  removeAlexaBetaTest,
 } from './users';
 import { wrapAsync } from './util/api';
 import { validateEmail } from './util/email';
@@ -314,7 +313,7 @@ app.get('/privacy-policy/alexa', wrapAsync(async (req, res) => {
 }));
 
 app.get('/admin', isAdminMiddleware, wrapAsync(async (req, res) => {
-  const skillIds = await AlexaSkills.getValue([]);
+  const skillIds: string[] = await AlexaSkills.getValue([]);
   const skills = await getAlexaSkillsWithBetaTests(skillIds);
   res.render('admin', { skills, error: _.get(res, 'locals.app.errorMessage') });
 }));

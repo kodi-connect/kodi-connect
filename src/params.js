@@ -11,21 +11,40 @@ mongoose.model('Params', ParamsSchema);
 
 export const ParamsModel = mongoose.model('Params');
 
-async function getParam(name: string, defaultValue: ?any): Promise<?any> {
-  const param = await ParamsModel.findOne({ name }).lean();
-  return (param && param.value) || defaultValue;
+// async function getParam<T>(name: string, defaultValue: ?T): Promise<?T> {
+//   const param = await ParamsModel.findOne({ name }).lean();
+//   return (param && param.value) || defaultValue || undefined;
+// }
+//
+// async function setParam<T>(name: string, value: T): Promise<void> {
+//   await ParamsModel.findOneAndUpdate({ name }, { name, value }, { upsert: true });
+// }
+
+// function createParam<T>(name: string) {
+//   return {
+//     getValue: (defaultValue: ?T) => getParam(name, defaultValue),
+//     setValue: (value: T) => setParam(name, value),
+//   };
+// }
+
+class Param<T> {
+  name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  async getValue(defaultValue: T): Promise<T> {
+    const param = await ParamsModel.findOne({ name: this.name }).lean();
+    return (param && param.value) || defaultValue;
+  }
+
+  async setValue(value: T): Promise<void> {
+    await ParamsModel.findOneAndUpdate({ name: this.name }, { name: this.name, value }, { upsert: true });
+  }
 }
 
-async function setParam(name: string, value: any): Promise<void> {
-  await ParamsModel.findOneAndUpdate({ name }, { name, value }, { upsert: true });
-}
+export const AmazonCredentials: Param<?Object> = new Param('AmazonCredentials');
+export const AlexaSkills: Param<Array<string>> = new Param('AlexaSkills');
 
-function createParam(name: string) {
-  return {
-    getValue: (defaultValue: ?any) => getParam(name, defaultValue),
-    setValue: (value: any) => setParam(name, value),
-  };
-}
-
-export const AmazonCredentials = createParam('AmazonCredentials');
-export const AlexaSkills = createParam('AlexaSkills');
+// export const AmazonCredentials = createParam<Object>('AmazonCredentials');
+// export const AlexaSkills = createParam('AlexaSkills');

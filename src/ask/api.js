@@ -64,7 +64,7 @@ async function refreshTokenRequest(refreshToken: string) {
 }
 
 async function getAccessToken() {
-  let accessTokens = await AmazonCredentials.getValue();
+  let accessTokens = await AmazonCredentials.getValue(undefined);
 
   if (!accessTokens) throw new AccessTokenNotFound();
 
@@ -72,19 +72,19 @@ async function getAccessToken() {
     const accessTokensData = await refreshTokenRequest(accessTokens.refresh_token);
     accessTokens = transformAccessTokenData(accessTokensData);
 
-    AmazonCredentials.setValue(accessTokens);
+    await AmazonCredentials.setValue(accessTokens);
   }
 
   return accessTokens.access_token;
 }
 
-export async function askRequest(options: Object) {
+export async function askRequest(options: Object): $Call<axios> {
   const { path, headers, ...restOptions } = options;
-
-  const accessToken = await getAccessToken();
 
   for (let attempt = 0; ; attempt += 1) {
     try {
+      const accessToken = await getAccessToken();
+
       return await axios({
         ...restOptions,
         url: `https://api.amazonalexa.com${path}`,

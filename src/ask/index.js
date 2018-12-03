@@ -284,7 +284,7 @@ export async function isSkillBetaTestEnding(skillId: string) {
   return isBetaTestEnding(betaTest);
 }
 
-export async function addSkill(): string {
+export async function addSkill(): Promise<string> {
   let skillId;
   try {
     skillId = await createSkill();
@@ -323,8 +323,8 @@ function pickBestAlexaSkill(alexaSkillsWithBetaTests: Object[]) {
   return alexaSkillsWithBetaTests.find(({ betaTest }) => betaTest.invitesRemaining > 0);
 }
 
-async function getBestAlexaSkill(): Promise<string> {
-  const alexaSkills = await AlexaSkills.getValue();
+async function getBestAlexaSkill(): Promise<{ skillId: string, invitationUrl: string }> {
+  const alexaSkills = await AlexaSkills.getValue([]);
 
   const alexaSkillsWithBetaTests = await Promise.all(alexaSkills.map(async (skillId) => {
     const betaTest = await getBetaTest(skillId);

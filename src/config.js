@@ -1,6 +1,12 @@
 // @flow
 
-const config = {
+function getHostUrl(): string {
+  const hostUrl = process.env.HOST_URL || (process.env.NODE_ENV === 'development' && 'http://localhost:3005');
+  if (!hostUrl) throw new Error('HOST_URL not defined');
+  return hostUrl;
+}
+
+const config = Object.freeze({
   amazonAuthUrl: 'https://api.amazon.com/auth/o2/token',
   amazonClientId: process.env.AMAZON_CLIENT_ID || 'dummy_client_id',
   amazonClientSecret: process.env.AMAZON_CLIENT_SECRET || 'dummy_client_secret',
@@ -17,7 +23,7 @@ const config = {
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
 
-  hostUrl: process.env.HOST_URL || (process.env.NODE_ENV === 'development' && 'http://localhost:3005'),
+  hostUrl: getHostUrl(),
 
   emailAddress: process.env.EMAIL_ADDRESS,
   emailPassword: process.env.EMAIL_PASSWORD,
@@ -25,6 +31,6 @@ const config = {
   bugsnag: {
     key: process.env.BUGSNAG_KEY,
   },
-};
+});
 
 export default config;
