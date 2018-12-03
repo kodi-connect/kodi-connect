@@ -27,5 +27,13 @@ jobs:
           command: yarn flowtyped
 
       - run:
-          name: Run eslint, yarn, and tests
+          name: Run tests
           command: yarn test:unit
+
+      - run:
+          name: Run eslint
+          command: yarn test:lint
+
+      - run:
+          name: Run flow
+          command: yarn test:flow
