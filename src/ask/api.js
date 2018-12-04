@@ -54,8 +54,8 @@ async function refreshTokenRequest(refreshToken: string) {
     method: 'POST',
     url: 'https://api.amazon.com/auth/o2/token ',
     data: {
-      client_id: 'amzn1.application-oa2-client.2f7fd62ac6b1463b85d862a28526f78b',
-      client_secret: '33ea99b07022fce526dfad2036474fd795a7446f6230871e2616019647f508ab',
+      client_id: config.lwaClientId,
+      client_secret: config.lwaClientSecret,
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     },
