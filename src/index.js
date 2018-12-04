@@ -349,10 +349,10 @@ app.post('/admin/alexa-skill/remove/:id', isAdminMiddleware, wrapAsync(async (re
 
 app.get('/admin/lwa', isAdminMiddleware, wrapAsync(async (req, res) => {
   const query = qs.stringify({
-    client_id: 'amzn1.application-oa2-client.2f7fd62ac6b1463b85d862a28526f78b',
+    client_id: config.lwaClientId,
     scope: 'alexa::ask:skills:readwrite',
     response_type: 'code',
-    redirect_uri: 'https://mactunnel.kislan.sk/lwa/redirect_uri',
+    redirect_uri: `${config.hostUrl}/admin/lwa/redirect_uri`,
   });
   res.redirect(`https://www.amazon.com/ap/oa?${query}`);
 }));

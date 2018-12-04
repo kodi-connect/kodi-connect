@@ -20,6 +20,9 @@ const config = Object.freeze({
     eu: process.env.AMAZON_LAMBDA_EU,
   },
 
+  lwaClientId: process.env.LWA_CLIENT_ID || 'dummy_client_id',
+  lwaClientSecret: process.env.LWA_CLIENT_SECRET || 'dummy_client_secret',
+
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
 

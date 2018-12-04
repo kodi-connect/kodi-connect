@@ -4,6 +4,7 @@ import axios from 'axios';
 import { AmazonCredentials } from '../params';
 import createLogger from '../logging';
 import { sleep } from '../util/time';
+import config from '../config';
 
 const MAX_ATTEMPTS = 5;
 const MIN_ACCESS_TOKEN_LIFETIME = 5 * 1000; // 5 seconds
@@ -35,11 +36,11 @@ export async function accessTokenRequest(authorizationCode: string) {
     method: 'POST',
     url: 'https://api.amazon.com/auth/o2/token ',
     data: {
-      client_id: 'amzn1.application-oa2-client.2f7fd62ac6b1463b85d862a28526f78b',
-      client_secret: '33ea99b07022fce526dfad2036474fd795a7446f6230871e2616019647f508ab',
+      client_id: config.lwaClientId,
+      client_secret: config.lwaClientSecret,
       grant_type: 'authorization_code',
       code: authorizationCode,
-      redirect_uri: 'https://mactunnel.kislan.sk/lwa/redirect_uri',
+      redirect_uri: `${config.hostUrl}/admin/lwa/redirect_uri`,
     },
   });
 
