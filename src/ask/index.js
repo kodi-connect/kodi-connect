@@ -334,7 +334,7 @@ export async function restartBetaTest(skillId: string) {
 }
 
 function pickBestAlexaSkill(alexaSkillsWithBetaTests: Object[]) {
-  return alexaSkillsWithBetaTests.sort((a, b) => a.betaTest.invitesRemaining - b.betaTest.invitesRemaining)[0]
+  return alexaSkillsWithBetaTests.sort((a, b) => b.betaTest.invitesRemaining - a.betaTest.invitesRemaining)[0];
 }
 
 async function getBestAlexaSkill(): Promise<{ skillId: string, invitationUrl: string }> {
