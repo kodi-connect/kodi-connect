@@ -13,34 +13,34 @@ import type { AwsRegion, AccessTokenRequest, AmazonTokens } from './types';
 
 const logger = createLogger('amazon');
 
+async function accessTokenRequestIter(request: AccessTokenRequest): Promise<Object> {
+  let lastError;
+
+  for (const [amazonClientId, amazonClientSecret] of config.amazonClientCredentials) {
+    try {
+      return await axios({
+        method: 'POST',
+        url: config.amazonAuthUrl,
+        data: {
+          ...request,
+          client_id: amazonClientId,
+          client_secret: amazonClientSecret,
+        },
+      });
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw new Error(stringifyError(lastError) || lastError.message);
+}
+
 async function accessTokenRequest(region: AwsRegion, request: AccessTokenRequest): Promise<AmazonTokens> {
   const currentTime = Date.now();
 
   logger.debug('Requesting access tokens', { region, request });
 
-  let response;
-  try {
-    response = await axios({
-      method: 'POST',
-      url: config.amazonAuthUrl,
-      data: {
-        ...request,
-        client_id: config.amazonClientId,
-        client_secret: config.amazonClientSecret,
-      },
-    });
-  } catch (error) {
-    logger.error(
-      'Failed to get amazon tokens',
-      {
-        error,
-        data: error.response && error.response.data,
-        region,
-        request,
-      },
-    );
-    throw new Error(stringifyError(error) || error.message);
-  }
+  const response = await accessTokenRequestIter(request);
 
   const accessTokenResponse = validateAccessTokenResponse(response.data);
 
