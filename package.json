@@ -19,6 +19,7 @@
     "docker:build": "docker build -f dev.Dockerfile -t kodi-connect/kodi-connect:dev ."
   },
   "dependencies": {
+    "ajv": "^6.10.0",
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
@@ -46,7 +47,7 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-flowtype": "^2.40.1",
     "eslint-plugin-import": "^2.8.0",
-    "flow-bin": "^0.62.0",
+    "flow-bin": "^0.100.0",
     "flow-typed": "^2.5.1",
     "jest": "^22.4.3",
     "nodemon": "^1.14.5",

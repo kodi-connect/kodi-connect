@@ -40,12 +40,7 @@ const MongoStore = connectMongo(session);
 
 const oauthFields = ['state', 'response_type', 'redirect', 'client_id', 'client_secret', 'redirect_uri'];
 
-const mongoConnectString = process.env.MONGO_URL;
-if (!mongoConnectString) throw new Error('MONGO_URL not defined');
-const sessionSecret = process.env.SESSION_SECRET || (process.env.NODE_ENV === 'development' && 'TopSecret');
-if (!sessionSecret) throw new Error('SESSION_SECRET not defined');
-
-mongoose.connect(mongoConnectString, (error) => {
+mongoose.connect(config.mongoConnectString, (error) => {
   if (error) {
     logger.error('ERROR connecting to MongoDB', { error });
   } else {
@@ -68,7 +63,7 @@ const kodiInstances = createTunnelServer(server, '/ws');
 app.set('view engine', 'pug');
 
 app.use(session({
-  secret: sessionSecret,
+  secret: config.sessionSecret,
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
   }),

@@ -32,7 +32,7 @@ async function accessTokenRequestIter(request: AccessTokenRequest): Promise<Obje
     }
   }
 
-  throw new Error(stringifyError(lastError) || lastError.message);
+  throw new Error(stringifyError(lastError) || (lastError && lastError.message) || 'Unknown message');
 }
 
 async function accessTokenRequest(region: AwsRegion, request: AccessTokenRequest): Promise<AmazonTokens> {

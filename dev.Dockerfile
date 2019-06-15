@@ -1,7 +1,8 @@
-FROM node:8.9.4
+FROM node:10.16.0
 
 RUN apt-get update && \
   apt-get -y install \
+    git \
     python-pip \
     python-dev && \
   pip install awscli --upgrade

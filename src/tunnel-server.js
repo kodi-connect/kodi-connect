@@ -2,15 +2,17 @@
 
 import { Server as WsServer } from 'ws';
 
-import createTunnel from './tunnel';
-import { getDevice } from './users';
+import createTunnel, { RpcTimeoutError } from './tunnel';
+import { getDevice, isUsersDevice } from './users';
 import { parseAuthorizationHeader } from './util/api';
 import createLogger from './logging';
 
 const logger = createLogger('tunnel-server');
 
-export default function createTunnelServer(server: Object, path: string): Object {
-  const kodiInstances: Object = {};
+export type KodiInstances = Object;
+
+export default function createTunnelServer(server: Object, path: string): KodiInstances {
+  const kodiInstances: KodiInstances = {};
 
   const wss = new WsServer({ server, clientTracking: true, path });
 
@@ -59,4 +61,86 @@ export default function createTunnelServer(server: Object, path: string): Object
   });
 
   return kodiInstances;
+}
+
+export class DeviceUnreachableError extends Error {
+  constructor() {
+    super('Device not connected');
+  }
+}
+export class DeviceNotOwner extends Error {
+  constructor() {
+    super('User is not owner of the device');
+  }
+}
+
+export class DeviceUnknownCommand extends Error {
+  constructor() {
+    super('Device can\'t handle requested command');
+  }
+}
+
+export async function kodiRpc(kodiInstances: KodiInstances, username: string, deviceId: string, rpc: Object): Promise<Object> {
+  if (!kodiInstances[deviceId]) {
+    throw new DeviceUnreachableError();
+  }
+
+  const validDevice = await isUsersDevice(username, deviceId);
+  if (!validDevice) {
+    throw new DeviceNotOwner();
+  }
+
+  logger.info('Sending message to kodi', { deviceId, rpc });
+
+  try {
+    const rpcRes = await kodiInstances[deviceId].rpc(rpc);
+    logger.info('Response message from kodi', { deviceId, rpcRes });
+
+    if (rpcRes.status === 'error') {
+      switch (rpcRes.error) {
+        case 'unknown_command':
+          throw new DeviceUnknownCommand();
+        default:
+          throw new Error(`Unknown error received: ${rpcRes.error}`);
+      }
+    }
+
+    return rpcRes;
+  } catch (error) {
+    if (error instanceof RpcTimeoutError) {
+      logger.warn('RPC Timeout', { deviceId, rpc });
+      throw new Error('Timeout');
+    } else {
+      logger.error('RPC call failed', { error });
+      throw new Error('RPC failed');
+    }
+  }
+}
+
+export type CommandType = 'state' |
+  'turnOn' |
+  'turnOff' |
+  'next' |
+  'previous' |
+  'startOver' |
+  'play' |
+  'pause' |
+  'stop' |
+  'rewind' |
+  'fastForward' |
+  'setVolume' |
+  'adjustVolume' |
+  'setMute' |
+  'searchAndPlay' |
+  'searchAndDisplay' |
+  'seek';
+
+export async function kodiRpcCommand(
+  kodiInstances: KodiInstances,
+  username: string,
+  deviceId: string,
+  commandType: CommandType,
+  additionalData?: Object,
+): Promise<Object> {
+  return await kodiRpc(kodiInstances, username, deviceId, { type: 'command', commandType, ...additionalData });
 }
