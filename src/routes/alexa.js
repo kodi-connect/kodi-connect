@@ -44,7 +44,12 @@ export default function createAlexaRouter(oauth: Object) {
     try {
       tokens = await amazon.getUserAuthTokens(region, code);
     } catch (error) {
-      logger.error('Failed to get amazon tokens', { error, username, region });
+      logger.error(
+        'Failed to get amazon tokens',
+        {
+          error, username, region, code,
+        },
+      );
       // res.sendStatus(400);
       res.sendStatus(200); // FIXME - this is because people are connecting from 2 different skills
       return;

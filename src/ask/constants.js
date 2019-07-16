@@ -81,21 +81,21 @@ export const SKILL_MANIFEST = {
           ],
         },
       },
-      endpoint: {
-        uri: config.amazonLambda.us,
-      },
-      regions: {
-        EU: {
-          endpoint: {
-            uri: config.amazonLambda.eu,
-          },
-        },
-        NA: {
-          endpoint: {
-            uri: config.amazonLambda.us,
-          },
-        },
-      },
+      // endpoint: {
+      //   uri: config.amazonLambda.us,
+      // },
+      // regions: {
+      //   EU: {
+      //     endpoint: {
+      //       uri: config.amazonLambda.eu,
+      //     },
+      //   },
+      //   NA: {
+      //     endpoint: {
+      //       uri: config.amazonLambda.us,
+      //     },
+      //   },
+      // },
     },
   },
   manifestVersion: '1.0',
@@ -141,4 +141,3 @@ export const ACCOUNT_LINKING = {
   ],
   type: 'AUTH_CODE',
 };
-

@@ -23,6 +23,8 @@ type BetaTest = {
   status: BetaTest
 }
 
+const VENDOR_ID = 'M26THQ9LJL7SS3';
+
 class BetaTestNotFound extends Error {
   constructor() {
     super('Beta test not found');
@@ -41,10 +43,79 @@ function testerValid(tester: Tester): boolean {
   return tester.invitationStatus === 'ACCEPTED' || daysBeforeNow(tester.associationDate) < 3;
 }
 
-async function getSkillStatus(skillId: string) {
+export async function getVendors(lwaCredentials: Object) {
+  logger.info('getVendors');
+  try {
+    const response = await askRequest(lwaCredentials, {
+      method: 'GET',
+      path: '/v1/vendors',
+    });
+
+    return response.data.vendors;
+  } catch (error) {
+    logger.error('Get Vendors failed', { error });
+    throw Error('Get Vendors failed');
+  }
+}
+
+export async function getVendorId(lwaCredentials: Object): Promise<string> {
+  const vendors = await getVendors(lwaCredentials);
+  const vendor = vendors.find(v => v.roles.includes('ROLE_ADMINISTRATOR'));
+  if (!vendor) throw new Error('Vendor ID not found');
+  return vendor.id;
+}
+
+export async function getSkills(lwaCredentials: Object) {
+  logger.info('getSkills');
+  try {
+    const response = await askRequest(lwaCredentials, {
+      method: 'GET',
+      path: '/v1/skills',
+      params: {
+        vendorId: (await getVendorId(lwaCredentials)),
+      },
+    });
+
+    return response.data.skills;
+  } catch (error) {
+    logger.error('Get Skills failed', { error });
+    throw Error('Get Skills failed');
+  }
+}
+
+export async function getSkillManifest(lwaCredentials: Object, skillId: string): Promise<Object> {
+  logger.info('getSkillManifest');
+  try {
+    const response = await askRequest(lwaCredentials, {
+      method: 'GET',
+      path: `/v1/skills/${skillId}/stages/development/manifest`,
+    });
+
+    return response.data.manifest;
+  } catch (error) {
+    logger.error('Get Skill Manifest failed', { error });
+    throw Error('Get Skill Manifest failed');
+  }
+}
+
+export async function getSkill(lwaCredentials: Object): Promise<?Object> {
+  const skills = await getSkills(lwaCredentials);
+  const skill = skills.find(s => s.apis.includes('video') && s.nameByLocale['en-US'] === 'Kodi');
+  if (!skill) return null;
+
+  const { skillId } = skill;
+
+  const manifest = await getSkillManifest(lwaCredentials, skillId);
+  return {
+    skillId,
+    manifest,
+  };
+}
+
+async function getSkillStatus(lwaCredentials: Object, skillId: string) {
   logger.info('getSkillStatus', { skillId });
   try {
-    const response = await askRequest({
+    const response = await askRequest(lwaCredentials, {
       method: 'GET',
       path: `/v1/skills/${skillId}/status`,
       params: {
@@ -54,16 +125,34 @@ async function getSkillStatus(skillId: string) {
 
     return response.data.manifest.lastUpdateRequest;
   } catch (error) {
-    logger.error('Create Skill failed', { error });
-    throw Error('Create Skill failed');
+    logger.error('Get Skill Status failed', { error });
+    throw Error('Get Skill Status failed');
   }
 }
 
-async function waitForSkillCreation(skillId: string, seconds: number = 5) {
+export async function getSkillCredentials(lwaCredentials: Object, skillId: string) {
+  logger.info('getSkillCredentials', { skillId });
+  try {
+    const response = await askRequest(lwaCredentials, {
+      method: 'GET',
+      path: `/v1/skills/${skillId}/credentials`,
+      params: {
+        resource: 'manifest',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    logger.error('Get Skill Credentials failed', { error });
+    throw Error('Get Skill Credentials failed');
+  }
+}
+
+async function waitForSkillCreation(lwaCredentials: Object, skillId: string, seconds: number = 5) {
   logger.info('waitForSkillCreation', { skillId, seconds });
   for (let i = 0; i < seconds; i += 1) {
     await sleep(1000);
-    const { status, errors } = await getSkillStatus(skillId);
+    const { status, errors } = await getSkillStatus(lwaCredentials, skillId);
     switch (status) {
       case 'IN_PROGRESS':
         break;
@@ -81,15 +170,15 @@ async function waitForSkillCreation(skillId: string, seconds: number = 5) {
   throw Error('Skill creation timeout');
 }
 
-async function createSkill() {
+async function createSkill(lwaCredentials: Object) {
   logger.info('createSkill');
   try {
-    const response = await askRequest({
+    const response = await askRequest(lwaCredentials, {
       method: 'POST',
       path: '/v1/skills',
       data: {
         manifest: SKILL_MANIFEST,
-        vendorId: 'M26THQ9LJL7SS3',
+        vendorId: (await getVendorId(lwaCredentials)),
       },
     });
 
@@ -100,10 +189,10 @@ async function createSkill() {
   }
 }
 
-async function updateAccountLinking(skillId: string) {
+async function updateAccountLinking(lwaCredentials: Object, skillId: string) {
   logger.info('updateAccountLinking', { skillId });
   try {
-    await askRequest({
+    await askRequest(lwaCredentials, {
       method: 'PUT',
       path: `/v1/skills/${skillId}/stages/development/accountLinkingClient`,
       data: {
@@ -116,10 +205,10 @@ async function updateAccountLinking(skillId: string) {
   }
 }
 
-export async function deleteSkill(skillId: string) {
+export async function deleteSkill(lwaCredentials: Object, skillId: string) {
   logger.info('deleteSkill', { skillId });
   try {
-    await askRequest({
+    await askRequest(lwaCredentials, {
       method: 'DELETE',
       path: `/v1/skills/${skillId}`,
     });
@@ -296,22 +385,22 @@ export async function isSkillBetaTestEnding(skillId: string) {
   return isBetaTestEnding(betaTest);
 }
 
-export async function addSkill(): Promise<string> {
+export async function addSkill(lwaCredentials: Object): Promise<string> {
   logger.info('addSkill');
   let skillId;
   try {
-    skillId = await createSkill();
-    await waitForSkillCreation(skillId);
-    await updateAccountLinking(skillId);
-    await createBetaTest(skillId);
-    await waitForSkillBetaTestStatus(skillId, 'IN_DRAFT');
-    await startBetaTest(skillId);
-    await waitForSkillBetaTestStatus(skillId, 'RUNNING');
+    skillId = await createSkill(lwaCredentials);
+    await waitForSkillCreation(lwaCredentials, skillId);
+    await updateAccountLinking(lwaCredentials, skillId);
+    // await createBetaTest(skillId);
+    // await waitForSkillBetaTestStatus(skillId, 'IN_DRAFT');
+    // await startBetaTest(skillId);
+    // await waitForSkillBetaTestStatus(skillId, 'RUNNING');
   } catch (error) {
     try {
-      if (skillId) await deleteSkill(skillId);
+      if (skillId) await deleteSkill(lwaCredentials, skillId);
     } catch (deleteError) {
-      logger.error('Failed to cleanup hanging skill', { error, skillId });
+      logger.error('Failed to cleanup hanging skill', { error: deleteError, skillId });
     }
     throw error;
   }

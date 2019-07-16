@@ -20,7 +20,7 @@ const event = {
         token: '6f2dc0588323d6977a5c1afc23a687f6e571cbc3',
       },
     },
-  },
+  } ,
 };
 
 describe('Authorization', () => {

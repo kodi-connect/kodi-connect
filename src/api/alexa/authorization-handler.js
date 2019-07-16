@@ -7,23 +7,23 @@ import { validateAwsRegion } from '../../type-validation';
 import createLogger from '../../logging';
 import type { AwsRegion } from '../../types';
 import type { AlexaHandlerRequest } from './types';
+import * as amazon from '../../amazon';
+import { storeAmazonTokens } from '../../users';
 
 const logger = createLogger('api/alexa/authorization-handler');
 
-async function authorizeUser(accessToken: string, code: string, region: AwsRegion) {
-  logger.debug(`Authorize user: ${accessToken}, ${code}, ${region}`);
+async function authorizeUser(username: string, accessToken: string, code: string, region: AwsRegion) {
+  logger.debug(`Authorize user: ${username} ${accessToken}, ${code}, ${region}`);
 
-  // let tokens;
-  // try {
-  //   tokens = await amazon.getUserAuthTokens(region, code);
-  // } catch (error) {
-  //   logger.error('Failed to get amazon tokens', { error, username, region });
-  //   // res.sendStatus(400);
-  //   res.sendStatus(200); // FIXME - this is because people are connecting from 2 different skills
-  //   return;
-  // }
+  let tokens;
+  try {
+    tokens = await amazon.getUserAuthTokens(region, code);
+  } catch (error) {
+    logger.error('Failed to get amazon tokens', { error, username, region });
+    return;
+  }
 
-  // await storeAmazonTokens(username, tokens);
+  await storeAmazonTokens(username, tokens);
 }
 
 export default async function authorizationHandler({ event, meta, username }: AlexaHandlerRequest) {
@@ -38,7 +38,7 @@ export default async function authorizationHandler({ event, meta, username }: Al
 
       try {
         region = validateAwsRegion(meta.region);
-        await authorizeUser(granteeToken, grantCode, region);
+        await authorizeUser(username, granteeToken, grantCode, region);
       } catch (error) {
         logger.error('Invalid aws region', { error, username, regionValue });
       }

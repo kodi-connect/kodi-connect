@@ -1,6 +1,13 @@
-tr.device-row
-    td= skill.id
-    td(style='font-family: monospace;')= skill.invitesRemaining
-    td
-        form(method='POST' action='/admin/alexa-skill/remove/' + skill.id)
-            button.pt-button.pt-minimal.pt-icon-trash(type='submit' name='remove')
+extends layout.pug
+
+block head
+    title Kodi Connect - Alexa Skill
+
+block content
+    h1 Alexa Skill
+    if error
+        p Error: #{error}
+
+    if !skillCreated
+        form(method='POST' action='/alexa-skill/create')
+            button.pt-button(type='submit' name='create') Create skill
