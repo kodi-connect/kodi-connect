@@ -7,6 +7,10 @@ function getHostUrl(): string {
 }
 
 const config = Object.freeze({
+  mongoConnectString: process.env.MONGO_URL,
+
+  sessionSecret: process.env.SESSION_SECRET || (process.env.NODE_ENV === 'development' && 'TopSecret'),
+
   amazonAuthUrl: 'https://api.amazon.com/auth/o2/token',
   amazonClientCredentials: [
     [
@@ -35,8 +39,8 @@ const config = Object.freeze({
   lwaClientId: process.env.LWA_CLIENT_ID || 'dummy_client_id',
   lwaClientSecret: process.env.LWA_CLIENT_SECRET || 'dummy_client_secret',
 
-  clientId: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
+  clientId: process.env.CLIENT_ID || 'dummy_client_id',
+  clientSecret: process.env.CLIENT_SECRET || 'dummy_client_secret',
 
   hostUrl: getHostUrl(),
 
@@ -47,5 +51,8 @@ const config = Object.freeze({
     key: process.env.BUGSNAG_KEY,
   },
 });
+
+if (!config.mongoConnectString) throw new Error('MONGO_URL not defined');
+if (!config.sessionSecret) throw new Error('SESSION_SECRET not defined');
 
 export default config;

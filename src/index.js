@@ -30,9 +30,17 @@ import alexaRouter from './routes/alexa';
 import createTunnelServer from './tunnel-server';
 import config from './config';
 import createLogger from './logging';
-import { accessTokenRequest, transformAccessTokenData } from './ask/api';
-import { AlexaSkills, AmazonCredentials } from './params';
-import { addBetaTester, addSkill, deleteSkill, getAlexaSkillsWithBetaTests, removeBetaTester } from './ask';
+import { accessTokenRequest, accessTokenValid, transformAccessTokenData } from './ask/api';
+import { AlexaSkills } from './params';
+import {
+  addBetaTester,
+  addSkill,
+  deleteSkill,
+  getAlexaSkillsWithBetaTests,
+  getSkill,
+  getSkillCredentials,
+  removeBetaTester,
+} from './ask';
 
 const logger = createLogger('index');
 
@@ -40,12 +48,7 @@ const MongoStore = connectMongo(session);
 
 const oauthFields = ['state', 'response_type', 'redirect', 'client_id', 'client_secret', 'redirect_uri'];
 
-const mongoConnectString = process.env.MONGO_URL;
-if (!mongoConnectString) throw new Error('MONGO_URL not defined');
-const sessionSecret = process.env.SESSION_SECRET || (process.env.NODE_ENV === 'development' && 'TopSecret');
-if (!sessionSecret) throw new Error('SESSION_SECRET not defined');
-
-mongoose.connect(mongoConnectString, (error) => {
+mongoose.connect(config.mongoConnectString, (error) => {
   if (error) {
     logger.error('ERROR connecting to MongoDB', { error });
   } else {
@@ -68,7 +71,7 @@ const kodiInstances = createTunnelServer(server, '/ws');
 app.set('view engine', 'pug');
 
 app.use(session({
-  secret: sessionSecret,
+  secret: config.sessionSecret,
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
   }),
@@ -318,55 +321,101 @@ app.get('/admin', isAdminMiddleware, wrapAsync(async (req, res) => {
   res.render('admin', { skills, error: _.get(res, 'locals.app.errorMessage') });
 }));
 
-app.post('/admin/alexa-skill/add', isAdminMiddleware, wrapAsync(async (req, res) => {
-  let skillId;
-  try {
-    skillId = await addSkill();
-  } catch (error) {
-    req.session.errorMessage = error.message;
-    res.redirect('/admin');
+// app.post('/admin/alexa-skill/add', isAdminMiddleware, wrapAsync(async (req, res) => {
+//   let skillId;
+//   try {
+//     skillId = await addSkill();
+//   } catch (error) {
+//     req.session.errorMessage = error.message;
+//     res.redirect('/admin');
+//     return;
+//   }
+//   const alexaSkills = await AlexaSkills.getValue([]);
+//   await AlexaSkills.setValue([...alexaSkills, skillId]);
+//
+//   logger.info('Added Alexa skill', { skillId });
+//
+//   res.redirect('/admin');
+// }));
+//
+// app.post('/admin/alexa-skill/remove/:id', isAdminMiddleware, wrapAsync(async (req, res) => {
+//   const { id: skillId } = req.params;
+//   await deleteSkill(skillId);
+//
+//   const alexaSkills = await AlexaSkills.getValue([]);
+//   await AlexaSkills.setValue(alexaSkills.filter(id => id !== skillId));
+//
+//   logger.info('Removed Alexa skill', { skillId });
+//
+//   res.redirect('/admin');
+// }));
+
+app.get('/alexa-skill', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
+  if (!req.session.lwaCredentials || !accessTokenValid(req.session.lwaCredentials.expires_at)) {
+    res.redirect('/alexa-skill/lwa');
     return;
   }
-  const alexaSkills = await AlexaSkills.getValue([]);
-  await AlexaSkills.setValue([...alexaSkills, skillId]);
 
-  logger.info('Added Alexa skill', { skillId });
+  console.log('LWA Credentials', req.session.lwaCredentials);
 
-  res.redirect('/admin');
+  // const vendors = await getVendors(req.session.lwaCredentials);
+  // console.log(JSON.stringify(vendors));
+
+  const skill = await getSkill(req.session.lwaCredentials);
+  console.log(JSON.stringify(skill, null, '  '));
+
+  const vars = {};
+
+  if (skill) {
+    vars.skillCreated = true;
+    vars.skill = true;
+    const { skillId, manifest } = skill;
+    console.log(manifest);
+
+    const skillCredentials = await getSkillCredentials(req.session.lwaCredentials, skillId);
+    console.log(skillCredentials);
+  }
+
+  console.log(vars);
+
+  res.render('alexa-skill', vars);
 }));
 
-app.post('/admin/alexa-skill/remove/:id', isAdminMiddleware, wrapAsync(async (req, res) => {
-  const { id: skillId } = req.params;
-  await deleteSkill(skillId);
+app.post('/alexa-skill/create', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
+  if (!req.session.lwaCredentials || !accessTokenValid(req.session.lwaCredentials.expires_at)) {
+    res.redirect('/alexa-skill/lwa');
+    return;
+  }
 
-  const alexaSkills = await AlexaSkills.getValue([]);
-  await AlexaSkills.setValue(alexaSkills.filter(id => id !== skillId));
+  const skillId = await addSkill(req.session.lwaCredentials);
+  const skillCredentials = await getSkillCredentials(req.session.lwaCredentials, skillId);
+  console.log(skillCredentials);
 
-  logger.info('Removed Alexa skill', { skillId });
 
-  res.redirect('/admin');
+  res.redirect('/alexa-skill');
 }));
 
-app.get('/admin/lwa', isAdminMiddleware, wrapAsync(async (req, res) => {
+app.get('/alexa-skill/lwa', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
+  // TODO - Check for credentials on the session
   const query = qs.stringify({
     client_id: config.lwaClientId,
     scope: 'alexa::ask:skills:readwrite',
     response_type: 'code',
-    redirect_uri: `${config.hostUrl}/admin/lwa/redirect_uri`,
+    redirect_uri: `${config.hostUrl}/alexa-skill/lwa/redirect_uri`,
   });
   res.redirect(`https://www.amazon.com/ap/oa?${query}`);
 }));
 
-app.get('/admin/lwa/redirect_uri', isAdminMiddleware, wrapAsync(async (req, res) => {
+app.get('/alexa-skill/lwa/redirect_uri', isLoggedInMiddleware(true), wrapAsync(async (req, res) => {
   try {
     const accessTokenData = await accessTokenRequest(req.query.code);
 
-    AmazonCredentials.setValue(transformAccessTokenData(accessTokenData));
+    req.session.lwaCredentials = transformAccessTokenData(accessTokenData);
   } catch (error) {
     logger.error('Failed to get Amazon tokens', { error, responseData: error.response && error.response.data });
   }
 
-  res.redirect('/');
+  res.redirect('/alexa-skill');
 }));
 
 app.get('/', wrapAsync(async (req, res) => {

@@ -6,6 +6,18 @@ import createLogger from '../logging';
 
 const logger = createLogger('utils');
 
+export class ApiError extends Error {
+  status: number;
+  response: ?Object;
+
+  constructor(inStatus?: number, response?: Object) {
+    const status = inStatus || 500;
+    super(`HTTP error response status: ${status}, ${response ? JSON.stringify(response) : 'null'}`);
+    this.status = status;
+    this.response = response;
+  }
+}
+
 export function wrapAsync(handler: Function) {
   return (req: Object, res: Object) => {
     const p = handler(req, res);

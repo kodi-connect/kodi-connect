@@ -17,7 +17,7 @@ class AccessTokenNotFound extends Error {
   }
 }
 
-function accessTokenValid(expires_at: number): boolean {
+export function accessTokenValid(expires_at: number): boolean {
   return Date.now() + MIN_ACCESS_TOKEN_LIFETIME < expires_at;
 }
 
@@ -40,7 +40,7 @@ export async function accessTokenRequest(authorizationCode: string) {
       client_secret: config.lwaClientSecret,
       grant_type: 'authorization_code',
       code: authorizationCode,
-      redirect_uri: `${config.hostUrl}/admin/lwa/redirect_uri`,
+      redirect_uri: `${config.hostUrl}/alexa-skill/lwa/redirect_uri`,
     },
   });
 
@@ -64,7 +64,7 @@ async function refreshTokenRequest(refreshToken: string) {
   return response.data;
 }
 
-async function getAccessToken() {
+export async function getAccessToken() {
   let accessTokens = await AmazonCredentials.getValue(undefined);
 
   if (!accessTokens) throw new AccessTokenNotFound();
@@ -79,12 +79,13 @@ async function getAccessToken() {
   return accessTokens.access_token;
 }
 
-export async function askRequest(options: Object): $Call<axios> {
+export async function askRequest(lwaCredentials: Object, options: Object): $Call<axios> {
   const { path, headers, ...restOptions } = options;
 
   for (let attempt = 0; ; attempt += 1) {
     try {
-      const accessToken = await getAccessToken();
+      // const accessToken = await getAccessToken();
+      const { access_token: accessToken } = lwaCredentials;
 
       return await axios({
         ...restOptions,

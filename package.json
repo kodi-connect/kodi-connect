@@ -19,6 +19,9 @@
     "docker:build": "docker build -f dev.Dockerfile -t kodi-connect/kodi-connect:dev ."
   },
   "dependencies": {
+    "@aws-sdk/client-lambda-node": "^0.1.0-preview.1",
+    "ajv": "^6.10.0",
+    "aws-sdk": "^2.372.0",
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
@@ -37,18 +40,20 @@
     "yup": "^0.26.3"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.1.2",
-    "babel-plugin-transform-flow-strip-types": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/plugin-transform-flow-strip-types": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/register": "^7.4.4",
+    "babel-eslint": "^10.0.1",
     "eslint": "^4.14.0",
-    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-flowtype": "^2.40.1",
     "eslint-plugin-import": "^2.8.0",
-    "flow-bin": "^0.62.0",
+    "flow-bin": "^0.100.0",
     "flow-typed": "^2.5.1",
-    "jest": "^22.4.3",
+    "jest": "^24.7.1",
     "nodemon": "^1.14.5",
     "npm-run-all": "^4.1.2",
     "wait-on": "^2.0.2"

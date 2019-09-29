@@ -1,13 +1,13 @@
 {
   "presets": [
-    ["env", {
+    ["@babel/preset-env", {
       "targets": {
-        "node": "8.9.0"
+        "node": "10.12.0"
       }
     }]
   ],
   "plugins": [
-    "transform-flow-strip-types",
-    "transform-object-rest-spread"
+    "@babel/plugin-transform-flow-strip-types",
+    "@babel/plugin-proposal-object-rest-spread"
   ]
 }
