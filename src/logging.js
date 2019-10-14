@@ -1,7 +1,5 @@
 // @flow
 
-import util from 'util';
-
 import bugsnag from 'bugsnag';
 
 type LoggerFunctionType = (message: string, data?: Object) => void;
@@ -62,7 +60,7 @@ function createLogFn(level: SeverityType, moduleName: string): LoggerFunctionTyp
           case 'error':
             return `errorMessage="${data[key].message}" errorStack="${data[key].stack}"`;
           default:
-            return `${key}="${typeof data[key] === 'object' ? util.inspect(data[key]) : data[key]}"`;
+            return `${key}="${typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key]}"`;
         }
       }),
     ].join(' ');

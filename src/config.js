@@ -27,7 +27,7 @@ const config = Object.freeze({
     ],
   ],
   amazonEventGatewayUrl: {
-    us: 'https://api.fe.amazonalexa.com/v3/events', // North America
+    us: 'https://api.amazonalexa.com/v3/events', // North America
     eu: 'https://api.eu.amazonalexa.com/v3/events', // Europe
     fe: 'https://api.fe.amazonalexa.com/v3/events', // Far East
   },

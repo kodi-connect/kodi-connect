@@ -1,7 +1,0 @@
-tr.device-row
-    td= alexaBetaTest.email
-    td
-        a(href=alexaBetaTest.invitationUrl target='_blank') Link
-    td
-        form(method='POST' action='/alexa-beta-tests/remove/' + encodeURIComponent(alexaBetaTest.email))
-            button.pt-button.pt-minimal.pt-icon-trash(type='submit' name='remove')

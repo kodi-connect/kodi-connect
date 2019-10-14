@@ -144,3 +144,18 @@ export async function kodiRpcCommand(
 ): Promise<Object> {
   return await kodiRpc(kodiInstances, username, deviceId, { type: 'command', commandType, ...additionalData });
 }
+
+export function asyncKodiRpcCommand(
+  kodiInstances: KodiInstances,
+  username: string,
+  deviceId: string,
+  commandType: CommandType,
+  additionalData?: Object,
+) {
+  kodiRpcCommand(kodiInstances, username, deviceId, commandType, additionalData)
+    .catch(
+      error => logger.error('Kodi RPC Command failed', {
+        error, username, deviceId, commandType, additionalData,
+      }),
+    );
+}

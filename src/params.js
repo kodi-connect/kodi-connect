@@ -13,6 +13,7 @@ export const ParamsModel = mongoose.model('Params');
 
 class Param<T> {
   name: string;
+
   constructor(name: string) {
     this.name = name;
   }
@@ -28,4 +29,3 @@ class Param<T> {
 }
 
 export const AmazonCredentials: Param<?Object> = new Param('AmazonCredentials');
-export const AlexaSkills: Param<Array<string>> = new Param('AlexaSkills');

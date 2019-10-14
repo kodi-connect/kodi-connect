@@ -4,10 +4,10 @@ import _ from 'lodash';
 import uuid from 'uuid/v4';
 import { kodiRpcCommand } from '../../tunnel-server';
 
-import type { AlexaHandlerRequest } from './types';
+import type { AlexaRequest } from './types';
 import type { KodiInstances } from '../../tunnel-server';
 
-export default async function seekControllerHandler({ event, username }: AlexaHandlerRequest, kodiInstances: KodiInstances) {
+export default async function seekControllerHandler({ event, username }: AlexaRequest, kodiInstances: KodiInstances) {
   const speakerOperation = _.get(event, 'directive.header.name');
   const endpointId = _.get(event, 'directive.endpoint.endpointId');
 

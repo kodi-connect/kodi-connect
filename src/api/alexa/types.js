@@ -1,11 +1,11 @@
 // @flow
 
-export type AlexaRequest = {
+export type AmazonAlexaRequest = {
     context: Object,
     event: Object,
 };
 
-export type AlexaHandlerRequest = AlexaRequest & {
+export type AlexaRequest = AmazonAlexaRequest & {
     username: string,
     meta: {
         region?: string,

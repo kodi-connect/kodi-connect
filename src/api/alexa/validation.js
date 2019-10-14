@@ -3,7 +3,7 @@
 import _ from 'lodash';
 import Ajv from 'ajv';
 
-import jsonSchemaDraft04 from 'ajv/lib/refs/json-schema-draft-04.json';
+import jsonSchemaDraft06 from 'ajv/lib/refs/json-schema-draft-06.json';
 import alexaSmartHomeMessageSchema from './alexa_smart_home_message_schema.json';
 import createLogger from '../../logging';
 
@@ -16,7 +16,7 @@ function jsonSchemaValidationImpl(response: Object): void {
   }
 
   const ajv = new Ajv({ schemaId: 'auto' });
-  ajv.addMetaSchema(jsonSchemaDraft04);
+  ajv.addMetaSchema(jsonSchemaDraft06);
 
   const valid = ajv.validate(alexaSmartHomeMessageSchema, response);
 

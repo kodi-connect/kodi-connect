@@ -17,14 +17,12 @@ import { jsonSchemaValidation } from './validation';
 import { DeviceUnreachableError, DeviceNotOwner, DeviceUnknownCommand } from '../../tunnel-server';
 import createLogger from '../../logging';
 import { wrapAsync } from '../../util/api';
-// import * as amazon from '../../amazon';
-// import { storeAmazonTokens } from '../../users';
-import type { AlexaRequest, AlexaHandlerRequest } from './types';
+import type { AmazonAlexaRequest, AlexaRequest } from './types';
 import type { KodiInstances } from '../../tunnel-server';
 
 const logger = createLogger('api/alexa');
 
-function getHandler(namespace): (AlexaHandlerRequest, KodiInstances) => Promise<{ header: Object, payload: Object, context?: Object }> {
+function getHandler(namespace): (AlexaRequest, KodiInstances) => Promise<{ header: Object, payload: Object, context?: Object }> {
   switch (namespace) {
     case 'Alexa':
       return defaultHandler;
@@ -54,12 +52,14 @@ function getErrorResponsePayload(error: Error) {
       type: 'ENDPOINT_UNREACHABLE',
       message: 'Unable to reach Kodi because it appears to be offline',
     };
-  } else if (error instanceof DeviceNotOwner) {
+  }
+  if (error instanceof DeviceNotOwner) {
     return {
       type: 'NO_SUCH_ENDPOINT',
       message: 'No such Kodi device connected',
     };
-  } else if (error instanceof DeviceUnknownCommand) {
+  }
+  if (error instanceof DeviceUnknownCommand) {
     return {
       type: 'FIRMWARE_OUT_OF_DATE',
       message: 'User should update Addon',
@@ -84,8 +84,32 @@ function getErrorResposne(error: Error, correlationToken: string) {
   };
 }
 
+function getOauthToken(req: Object) {
+  const { alexaRequest }: { alexaRequest: AmazonAlexaRequest } = req.body;
+  const namespace = _.get(alexaRequest, 'event.directive.header.namespace');
+
+  switch (namespace) {
+    case 'Alexa.Authorization':
+      return _.get(alexaRequest, 'event.directive.payload.grantee.token');
+    case 'Alexa.Discovery':
+      return _.get(alexaRequest, 'event.directive.payload.scope.token');
+    default:
+      return _.get(alexaRequest, 'event.directive.endpoint.scope.token');
+  }
+}
+
+function setOauthToken(req: Object, res: Object, next: Function) {
+  logger.debug('Extracting oath token from', { req: req.body });
+  const accessToken = getOauthToken(req);
+  logger.debug('Extracted oath token', { accessToken });
+
+  if (accessToken) req.headers.Authorization = `Bearer ${accessToken}`;
+
+  next();
+}
+
 export async function handler(
-  request: AlexaHandlerRequest,
+  request: AlexaRequest,
   kodiInstances: KodiInstances,
 ): Promise<{ context?: Object, event: { header: Object, payload: Object }}> {
   logger.debug('Request:');
@@ -112,11 +136,13 @@ export async function handler(
 export default function createAlexaRouter(oauth: Object, kodiInstances: KodiInstances) {
   const router = new Router({ mergeParams: true });
 
+  router.use(setOauthToken);
+
   router.post('/', oauth.authenticate(), wrapAsync(async (req, res) => {
     const username = _.get(res, 'locals.oauth.token.user.username');
-    const { alexaRequest, meta }: { alexaRequest: AlexaRequest, meta: Object } = req.body;
+    const { alexaRequest, meta }: { alexaRequest: AmazonAlexaRequest, meta: Object } = req.body;
 
-    const alexaHandlerRequest: AlexaHandlerRequest = {
+    const alexaHandlerRequest: AlexaRequest = {
       ...alexaRequest,
       meta,
       username,

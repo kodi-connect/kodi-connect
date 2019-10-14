@@ -34,16 +34,15 @@ const UserSchema = new Schema({
   activated: { type: Boolean },
   confirmationToken: { type: String },
   admin: { type: Boolean },
-  alexaBetaTests: [{
-    email: String,
-    skillId: String,
-    invitationUrl: String,
-  }],
   devices: [{
     id: { type: String },
     name: { type: String },
     secret: { type: String },
   }],
+  alexaSkillMessagingCredentials: {
+    clientId: String,
+    clientSecret: String,
+  },
   amazonTokens: {
     access_token: String,
     token_type: String,
@@ -194,6 +193,20 @@ export async function isUsersDevice(username: string, id: string) {
   return !!device;
 }
 
+export async function storeAlexaSkillMessagingCredentials(
+  username: string,
+  alexaSkillMessagingCredentials: { clientId: string, clientSecret: string },
+) {
+  await UsersModel.updateOne({ username }, { alexaSkillMessagingCredentials });
+}
+
+export async function getAlexaSkillMessagingCredentials(
+  username: string,
+): Promise<{ clientId: string, clientSecret: string}> {
+  const user = await UsersModel.findOne({ username }).lean();
+  return _.get(user, 'alexaSkillMessagingCredentials', {});
+}
+
 export async function storeAmazonTokens(
   username: string,
   amazonTokens: AmazonTokens,
@@ -204,39 +217,4 @@ export async function storeAmazonTokens(
 export async function getAmazonTokens(username: string): Promise<?AmazonTokens> {
   const user = await UsersModel.findOne({ username }, { amazonTokens: 1 });
   return user.amazonTokens;
-}
-
-export async function addAlexaBetaTest(
-  username: string,
-  email: string,
-  skillId: string,
-  invitationUrl: string,
-) {
-  const user = await UsersModel.findOne({ username, activated: true });
-
-  user.alexaBetaTests = [...user.alexaBetaTests || [], { email, skillId, invitationUrl }];
-
-  await user.save();
-}
-
-export async function getAlexaBetaTests(username: string) {
-  const user = await UsersModel.findOne({ username, activated: true }).lean();
-  return _.get(user, 'alexaBetaTests') || [];
-}
-
-export async function removeAlexaBetaTest(username: string, email: string) {
-  const user = await UsersModel.findOne({ username, activated: true });
-
-  const alexaBetaTest = user.alexaBetaTests.find(abt => abt.email === email);
-
-  if (!alexaBetaTest) {
-    logger.error('Alexa email not found for user', { username, email });
-    throw new Error('Alexa email not found for user');
-  }
-
-  user.alexaBetaTests = user.alexaBetaTests.filter(abt => abt.email !== email);
-
-  await user.save();
-
-  return alexaBetaTest.skillId;
 }
