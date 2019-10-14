@@ -1,8 +1,9 @@
-version: 2
+version: 2.1
+
 jobs:
-  build:
+  test:
     docker:
-      - image: circleci/node:8.9.4
+      - image: circleci/node:12.12.0
     steps:
       - checkout
 
@@ -37,3 +38,37 @@ jobs:
       - run:
           name: Run flow
           command: yarn test:flow
+
+  image:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Docker login
+          command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
+
+      - run:
+          name: Build image
+          command: docker build -t ${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH} .
+
+      - run:
+          name: Push image
+          command: docker push ${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH}
+
+      - run:
+          name: Push latest image
+          command: |
+            if [ "$CIRCLE_BRANCH" = "master" ]; then
+              docker tag ${CIRCLE_PROJECT_REPONAME}:${CIRCLE_BRANCH} ${CIRCLE_PROJECT_REPONAME}:latest
+              docker push ${CIRCLE_PROJECT_REPONAME}:push
+            fi
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+      - image:
+          requires:
+            - build
