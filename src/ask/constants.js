@@ -22,22 +22,22 @@ const LOCALES = [
 
 const DISTRIBUTION_COUNTRIES = LOCALES.map(locale => locale.split('-')[1]);
 
-const LOCALE_COUNTRY_MAP = {
-  'en-US': 'en',
-  'en-GB': 'en',
-  'en-AU': 'en',
-  'en-IN': 'en',
-  'en-CA': 'en',
-  'de-DE': 'de',
-  'fr-FR': 'fr',
-  'fr-CA': 'fr',
-  'it-IT': 'it',
-  'ja-JP': 'ja',
-  'pt-BR': 'pt',
-  'es-MX': 'es',
-  'es-ES': 'es',
-  'es-US': 'es',
-};
+// const LOCALE_COUNTRY_MAP = {
+//   'en-US': 'en',
+//   'en-GB': 'en',
+//   'en-AU': 'en',
+//   'en-IN': 'en',
+//   'en-CA': 'en',
+//   'de-DE': 'de',
+//   'fr-FR': 'fr',
+//   'fr-CA': 'fr',
+//   'it-IT': 'it',
+//   'ja-JP': 'ja',
+//   'pt-BR': 'pt',
+//   'es-MX': 'es',
+//   'es-ES': 'es',
+//   'es-US': 'es',
+// };
 
 // type Locale = $Keys<LOCALE_COUNTRY_MAP>;
 // type DistributionCountry = $Values<LOCALE_COUNTRY_MAP>;
