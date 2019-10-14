@@ -28,16 +28,16 @@ jobs:
           command: yarn flowtyped
 
       - run:
-          name: Run tests
-          command: yarn test:unit
-
-      - run:
           name: Run eslint
           command: yarn test:lint
 
       - run:
           name: Run flow
           command: yarn test:flow
+
+      - run:
+          name: Run tests
+          command: NODE_ENV=development yarn test:unit
 
   image:
       docker:
