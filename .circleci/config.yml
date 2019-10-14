@@ -68,7 +68,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - build:
+      - test:
       - image:
           requires:
             - build
