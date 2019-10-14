@@ -69,6 +69,7 @@ jobs:
               docker push ${CIRCLE_PROJECT_REPONAME}:push
             fi
 
+
 workflows:
   version: 2
   build:
