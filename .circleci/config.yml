@@ -50,6 +50,10 @@ jobs:
         - checkout
 
         - run:
+            name: Install Docker
+            command: curl -fsSL get.docker.com | bash
+
+        - run:
             name: Docker login
             command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
 
