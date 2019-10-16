@@ -37,8 +37,6 @@ router.get('/', wrapAsync(async (req, res) => {
     logger.info('skillCredentials', { skillCredentials });
   }
 
-  logger.info(vars);
-
   res.render('alexa-skill', vars);
 }));
 
@@ -83,6 +81,11 @@ router.post('/delete', wrapAsync(async (req, res) => {
   }
 
   const skill = await getSkill(req.session.lwaCredentials);
+
+  if (!skill) {
+    res.redirect('/alexa-skill');
+    return;
+  }
 
   const { skillId } = skill;
   await deleteSkill(req.session.lwaCredentials, skillId);

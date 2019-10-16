@@ -59,7 +59,7 @@ export function addLambdaPermission(awsCredentials: AwsCredentials, functionName
   });
 }
 
-export function getLambdaConfiguration(awsCredentials: AwsCredentials) {
+export function getLambdaConfiguration(awsCredentials: AwsCredentials): Promise<Object> {
   return new Promise((resolve, reject) => {
     const lambda = createLambda(awsCredentials);
     lambda.getFunctionConfiguration({

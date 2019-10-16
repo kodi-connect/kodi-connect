@@ -20,7 +20,7 @@ const LOCALES = [
   'es-US',
 ];
 
-const DISTRIBUTION_COUNTRIES = LOCALES.map(locale => locale.split('-')[1]);
+const DISTRIBUTION_COUNTRIES: string[] = LOCALES.map(locale => locale.split('-')[1]);
 
 // const LOCALE_COUNTRY_MAP = {
 //   'en-US': 'en',
