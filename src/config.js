@@ -7,7 +7,7 @@ function getHostUrl(): string {
 }
 
 const config = Object.freeze({
-  mongoConnectString: process.env.MONGO_URL,
+  mongoConnectString: process.env.MONGO_URL || (process.env.NODE_ENV === 'development' && 'mongodb://localhost:27017/kodi'),
 
   sessionSecret: process.env.SESSION_SECRET || (process.env.NODE_ENV === 'development' && 'TopSecret'),
 
