@@ -20,7 +20,7 @@ const LOCALES = [
   'es-US',
 ];
 
-const DISTRIBUTION_COUNTRIES: string[] = LOCALES.map(locale => locale.split('-')[1]);
+const DISTRIBUTION_COUNTRIES: string[] = LOCALES.map((locale) => locale.split('-')[1]);
 
 // const LOCALE_COUNTRY_MAP = {
 //   'en-US': 'en',
@@ -69,7 +69,10 @@ export function createSkillManifest(lambdaArn: string) {
           ],
           name: 'Kodi',
           smallIconUri: 'https://github.com/kodi-connect/kodi-alexa-video/raw/master/icons/kodi-alexa-small.png',
-          description: 'Connects your Kodi devices with Alexa, allowing you to control it with your voice.\nPlay and display movies by name, genre, actors, etc.\nPlay tv shows by episodes, or by next unwatched episode.\nControl playback (pause, resume, fast forward, etc.)',
+          description: 'Connects your Kodi devices with Alexa, allowing you to control it with your voice.\n'
+            + 'Play and display movies by name, genre, actors, etc.\n'
+            + 'Play tv shows by episodes, or by next unwatched episode.\n'
+            + 'Control playback (pause, resume, fast forward, etc.)',
           largeIconUri: 'https://github.com/kodi-connect/kodi-alexa-video/raw/master/icons/kodi-alexa.png',
         },
       }), {}),

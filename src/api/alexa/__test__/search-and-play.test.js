@@ -7,10 +7,10 @@ describe('Search and Play', () => {
     const { filter } = getEventAndFilter('play-comedy-mean-girls.json');
     expect(filter.titles).toEqual(['Mean Girls']);
     expect(filter.genres).toEqual(['Comedy', 'Comedy drama', 'Musical comedy', 'Romantic comedy']);
-    ['collections', 'actors', 'roles'].forEach(key => (
+    ['collections', 'actors', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
-    ['mediaType', 'season', 'episode'].forEach(key => (
+    ['mediaType', 'season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -20,10 +20,10 @@ describe('Search and Play', () => {
 
     expect(filter.genres).toEqual(['Comedy', 'Comedy drama', 'Musical comedy', 'Romantic comedy']);
     expect(filter.actors).toEqual(['Tom Hanks', 'Lloyd Hanks', 'Benjamin Hanks', 'Dannie Hanks', 'Megan Hanks']);
-    ['titles', 'collections', 'roles'].forEach(key => (
+    ['titles', 'collections', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
-    ['mediaType', 'season', 'episode'].forEach(key => (
+    ['mediaType', 'season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -32,11 +32,11 @@ describe('Search and Play', () => {
     const { filter } = getEventAndFilter('play-darth-vader-movies.json');
 
     expect(filter.roles).toEqual(['Darth Vader']);
-    ['titles', 'collections', 'genres', 'actors'].forEach(key => (
+    ['titles', 'collections', 'genres', 'actors'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
     expect(filter.mediaType).toBe('movie');
-    ['season', 'episode'].forEach(key => (
+    ['season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -45,10 +45,10 @@ describe('Search and Play', () => {
     const { filter } = getEventAndFilter('play-how-i-met-your-mother.json');
 
     expect(filter.titles).toEqual(['How I Met Your Mother', 'Goodbye How I Met Your Mother', 'How I Met Your Mother: Extras', 'How I Met Your Puppet Mother']);
-    ['collections', 'genres', 'actors', 'roles'].forEach(key => (
+    ['collections', 'genres', 'actors', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
-    ['mediaType', 'season', 'episode'].forEach(key => (
+    ['mediaType', 'season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -58,10 +58,10 @@ describe('Search and Play', () => {
 
     expect(filter.titles).toEqual(['Mean Girls']);
     expect(filter.actors).toEqual(['Lindsay Lohan', 'Ali Lohan', 'Horst Lohan', 'Dina Lohan', 'Treison Lohan']);
-    ['collections', 'genres', 'roles'].forEach(key => (
+    ['collections', 'genres', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
-    ['mediaType', 'season', 'episode'].forEach(key => (
+    ['mediaType', 'season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -71,10 +71,10 @@ describe('Search and Play', () => {
 
     expect(filter.titles).toEqual(['Girls']);
     expect(filter.actors).toEqual(['Lindsay Lohan', 'Ali Lohan', 'Horst Lohan', 'Dina Lohan', 'Treison Lohan']);
-    ['collections', 'genres', 'roles'].forEach(key => (
+    ['collections', 'genres', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
-    ['mediaType', 'season', 'episode'].forEach(key => (
+    ['mediaType', 'season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -84,10 +84,10 @@ describe('Search and Play', () => {
 
     expect(filter.collections).toEqual(['Thor']);
     expect(filter.actors).toEqual(['Chris Hemsworth', 'Chelsie Hemsworth', 'Liam Hemsworth', 'Luke Hemsworth', 'Maria Hemsworth']);
-    ['titles', 'genres', 'roles'].forEach(key => (
+    ['titles', 'genres', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
-    ['mediaType', 'season', 'episode'].forEach(key => (
+    ['mediaType', 'season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -96,11 +96,11 @@ describe('Search and Play', () => {
     const { filter } = getEventAndFilter('play-tv-show-the-orville.json');
 
     expect(filter.titles).toEqual(['The Orville', 'Orville', 'The Orville Preview']);
-    ['collections', 'genres', 'actors', 'roles'].forEach(key => (
+    ['collections', 'genres', 'actors', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
     expect(filter.mediaType).toBe('tv show');
-    ['season', 'episode'].forEach(key => (
+    ['season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -109,10 +109,10 @@ describe('Search and Play', () => {
     const { filter } = getEventAndFilter('watch-jason-statham.json');
 
     expect(filter.actors).toEqual(['Jason Statham', 'Kyley Statham', 'Jake Statham', 'Tony Statham', 'Joe Statham']);
-    ['titles', 'collections', 'genres', 'roles'].forEach(key => (
+    ['titles', 'collections', 'genres', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
-    ['mediaType', 'season', 'episode'].forEach(key => (
+    ['mediaType', 'season', 'episode'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });
@@ -121,12 +121,12 @@ describe('Search and Play', () => {
     const { filter } = getEventAndFilter('watch-season-2-episode-7-of-how-i-met-your-mother.json');
 
     expect(filter.titles).toEqual(['How I Met Your Mother', 'Goodbye How I Met Your Mother', 'How I Met Your Mother: Extras', 'How I Met Your Puppet Mother']);
-    ['collections', 'genres', 'actors', 'roles'].forEach(key => (
+    ['collections', 'genres', 'actors', 'roles'].forEach((key) => (
       expect(filter[key]).toEqual([])
     ));
     expect(filter.season).toEqual('2');
     expect(filter.episode).toEqual('7');
-    ['mediaType'].forEach(key => (
+    ['mediaType'].forEach((key) => (
       expect(filter[key]).toBeNull()
     ));
   });

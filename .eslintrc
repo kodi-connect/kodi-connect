@@ -9,7 +9,7 @@
     "jest": true
   },
   "rules": {
-    "max-len": [1, 160],
+    "max-len": [2, 160],
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true, "optionalDependencies": false, "peerDependencies": false }],
     "import/prefer-default-export": 0,
     "no-restricted-syntax": 0,

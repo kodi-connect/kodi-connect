@@ -12,8 +12,8 @@ async function changeStateHandler(username: string, deviceId: string, data: Obje
 
   const { changed, state, addon_change: addonChange } = data;
 
-  const changedState = state.find(s => s.name === changed);
-  const restState = state.filter(s => s.name !== changed);
+  const changedState = state.find((s) => s.name === changed);
+  const restState = state.filter((s) => s.name !== changed);
 
   if (!changedState) {
     logger.error('Invalid changed state', { data });

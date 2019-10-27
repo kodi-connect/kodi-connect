@@ -1,5 +1,6 @@
 // @flow
 
+// eslint-disable-next-line max-classes-per-file
 import { Server as WsServer } from 'ws';
 
 import createTunnel, { RpcTimeoutError } from './tunnel';
@@ -154,7 +155,7 @@ export function asyncKodiRpcCommand(
 ) {
   kodiRpcCommand(kodiInstances, username, deviceId, commandType, additionalData)
     .catch(
-      error => logger.error('Kodi RPC Command failed', {
+      (error) => logger.error('Kodi RPC Command failed', {
         error, username, deviceId, commandType, additionalData,
       }),
     );

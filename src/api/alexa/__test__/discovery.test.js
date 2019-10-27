@@ -24,7 +24,7 @@ describe('Discovery', () => {
   test('should discover devices', async () => {
     jest
       .spyOn(users, 'getDevices')
-      .mockImplementation(() => new Promise(resolve => resolve([])));
+      .mockImplementation(() => new Promise((resolve) => resolve([])));
 
     const response = await handler({
       event,

@@ -24,7 +24,7 @@ export async function getVendors(lwaCredentials: Object) {
 
 export async function getVendorId(lwaCredentials: Object): Promise<string> {
   const vendors = await getVendors(lwaCredentials);
-  const vendor = vendors.find(v => v.roles.includes('ROLE_ADMINISTRATOR'));
+  const vendor = vendors.find((v) => v.roles.includes('ROLE_ADMINISTRATOR'));
   if (!vendor) throw new Error('Vendor ID not found');
   return vendor.id;
 }
@@ -65,7 +65,7 @@ export async function getSkillManifest(lwaCredentials: Object, skillId: string):
 
 export async function getSkill(lwaCredentials: Object): Promise<?Object> {
   const skills = await getSkills(lwaCredentials);
-  const skill = skills.find(s => s.apis.includes('video') && s.nameByLocale['en-US'] === 'Kodi');
+  const skill = skills.find((s) => s.apis.includes('video') && s.nameByLocale['en-US'] === 'Kodi');
   if (!skill) return null;
 
   const { skillId } = skill;

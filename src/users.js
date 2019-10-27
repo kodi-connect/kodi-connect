@@ -72,7 +72,7 @@ function sendConfirmationEmail(username: string, confirmationToken: string) {
     logger.debug(`${config.hostUrl}/confirm/${confirmationToken}`);
     logger.debug('******************************');
 
-    return new Promise(resolve => resolve());
+    return new Promise((resolve) => resolve());
   }
 
   return new Promise((resolve, reject) => {
@@ -153,7 +153,7 @@ export async function getDevice(username: string, secret: string) {
   const devices = await getDevices(username);
   if (!devices) return null;
 
-  const device = devices.find(d => d.secret === secret);
+  const device = devices.find((d) => d.secret === secret);
 
   return device && device.id;
 }
@@ -164,7 +164,7 @@ export async function addDevice(
 ): Promise<{ errorMessage?: string, devices?: Object[] }> {
   const user = await UsersModel.findOne({ username, activated: true });
 
-  if (user.devices.find(d => d.name === name)) return { errorMessage: 'name_duplicity' };
+  if (user.devices.find((d) => d.name === name)) return { errorMessage: 'name_duplicity' };
 
   const id = uuid();
   const secret = randtoken.generate(kodiDeviceTokenLength, 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789');
@@ -178,7 +178,7 @@ export async function addDevice(
 
 export async function removeDevice(username: string, id: string) {
   const user = await UsersModel.findOne({ username, activated: true });
-  const updatedDevices = user.devices.filter(d => d.id !== id);
+  const updatedDevices = user.devices.filter((d) => d.id !== id);
   user.devices = updatedDevices;
   await user.save();
   return updatedDevices;
@@ -188,7 +188,7 @@ export async function isUsersDevice(username: string, id: string) {
   const devices = await getDevices(username);
   if (!devices) return false;
 
-  const device = devices.find(d => d.id === id);
+  const device = devices.find((d) => d.id === id);
 
   return !!device;
 }
