@@ -2,12 +2,12 @@
 
 import _ from 'lodash';
 import uuid from 'uuid/v4';
-import { kodiRpcCommand } from '../../tunnel-server';
+import { asyncKodiRpcCommand } from '../../tunnel-server';
 
-import type { AlexaHandlerRequest } from './types';
+import type { AlexaRequest } from './types';
 import type { KodiInstances } from '../../tunnel-server';
 
-export default async function playbackHandler({ event, username }: AlexaHandlerRequest, kodiInstances: KodiInstances) {
+export default async function playbackHandler({ event, username }: AlexaRequest, kodiInstances: KodiInstances) {
   const header = {
     messageId: uuid(),
     name: 'Response',
@@ -23,28 +23,28 @@ export default async function playbackHandler({ event, username }: AlexaHandlerR
 
   switch (playbackOperation) {
     case 'Next':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'next');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'next');
       break;
     case 'Previous':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'previous');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'previous');
       break;
     case 'StartOver':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'startOver');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'startOver');
       break;
     case 'Play':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'play');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'play');
       break;
     case 'Pause':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'pause');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'pause');
       break;
     case 'Stop':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'stop');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'stop');
       break;
     case 'Rewind':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'rewind');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'rewind');
       break;
     case 'FastForward':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'fastForward');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'fastForward');
       break;
     default:
       throw new Error(`Unknown playback operation: ${playbackOperation}`);

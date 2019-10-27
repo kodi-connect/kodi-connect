@@ -84,7 +84,6 @@ export async function askRequest(lwaCredentials: Object, options: Object): $Call
 
   for (let attempt = 0; ; attempt += 1) {
     try {
-      // const accessToken = await getAccessToken();
       const { access_token: accessToken } = lwaCredentials;
 
       return await axios({

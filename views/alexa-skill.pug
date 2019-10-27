@@ -8,6 +8,13 @@ block content
     if error
         p Error: #{error}
 
-    if !skillCreated
+    if !skillId
         form(method='POST' action='/alexa-skill/create')
+            input.pt-input(type='search' name='lambda_arn' placeholder='Lambda ARN' dir='auto')
             button.pt-button(type='submit' name='create') Create skill
+
+    if skillId
+        p Skill ID: #{skillId}
+
+        form(method='POST' action='/alexa-skill/delete')
+            button.pt-button(type='submit' name='delete') Delete skill

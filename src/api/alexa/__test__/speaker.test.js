@@ -76,7 +76,7 @@ const SET_MUTE_EVENT = {
 describe('Speaker', () => {
   test('set volume', async () => {
     const kodiRpcCommandSpy = jest
-      .spyOn(tunnelServer, 'kodiRpcCommand')
+      .spyOn(tunnelServer, 'asyncKodiRpcCommand')
       .mockImplementation(() => ({
         state: [{ name: 'volume', value: 10 }],
       }));
@@ -93,7 +93,7 @@ describe('Speaker', () => {
 
   test('adjust volume', async () => {
     const kodiRpcCommandSpy = jest
-      .spyOn(tunnelServer, 'kodiRpcCommand')
+      .spyOn(tunnelServer, 'asyncKodiRpcCommand')
       .mockImplementation(() => ({
         state: [{ name: 'volume', value: 10 }],
       }));
@@ -110,7 +110,7 @@ describe('Speaker', () => {
 
   test('set mute', async () => {
     const kodiRpcCommandSpy = jest
-      .spyOn(tunnelServer, 'kodiRpcCommand')
+      .spyOn(tunnelServer, 'asyncKodiRpcCommand')
       .mockImplementation(() => ({
         state: [{ name: 'volume', value: 10 }],
       }));

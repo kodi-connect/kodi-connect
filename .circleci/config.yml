@@ -1,13 +1,14 @@
-version: 2
+version: 2.1
+
 jobs:
-  build:
+  test:
     docker:
-      - image: circleci/node:8.9.4
+      - image: node:12.11.1
     steps:
       - checkout
 
       - restore_cache:
-          key: node-modules-{{ checksum ".circleci/config.yml" }}-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
+          key: node-modules-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
 
       - run:
           name: Print versions
@@ -18,7 +19,7 @@ jobs:
           command: yarn install
 
       - save_cache:
-          key: node-modules-{{ checksum ".circleci/config.yml" }}-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
+          key: node-modules-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
           paths:
             - node_modules
 
@@ -27,13 +28,54 @@ jobs:
           command: yarn flowtyped
 
       - run:
-          name: Run tests
-          command: yarn test:unit
-
-      - run:
           name: Run eslint
           command: yarn test:lint
 
       - run:
           name: Run flow
           command: yarn test:flow
+
+      - run:
+          name: Run tests
+          command: NODE_ENV=development yarn test:unit
+
+  image:
+      docker:
+        - image: docker:latest
+
+      steps:
+        - setup_remote_docker:
+            version: 18.09.3
+
+        - checkout
+
+        - run:
+            name: Docker login
+            command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
+
+        - run:
+            name: Build image
+            command: docker build -t kodiconnect/kodi-connect:${CIRCLE_BRANCH} .
+
+        - run:
+            name: Push image
+            command: docker push kodiconnect/kodi-connect:${CIRCLE_BRANCH}
+
+        - run:
+            name: Push latest image
+            command: |
+              if [ "$CIRCLE_BRANCH" = "master" ]; then
+                docker tag kodiconnect/kodi-connect:${CIRCLE_BRANCH} kodiconnect/kodi-connect:latest
+                docker push kodiconnect/kodi-connect:latest
+              else
+                echo "Skipping step"
+              fi
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test
+      - image:
+          requires:
+            - test

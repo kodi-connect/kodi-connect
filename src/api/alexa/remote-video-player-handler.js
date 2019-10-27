@@ -2,9 +2,9 @@
 
 import _ from 'lodash';
 import uuid from 'uuid/v4';
-import { kodiRpcCommand } from '../../tunnel-server';
+import { asyncKodiRpcCommand } from '../../tunnel-server';
 
-import type { AlexaHandlerRequest } from './types';
+import type { AlexaRequest } from './types';
 import type { KodiInstances } from '../../tunnel-server';
 
 export type VideoFilter = {
@@ -44,7 +44,7 @@ export function mapGenres(genres: string[]) {
 }
 
 export function createFilterFromEntities(entities: Object[]): VideoFilter {
-  const filter: VideoFilter = {
+  return {
     titles: getEntitiesByType(entities, 'Video'),
     collections: getEntitiesByType(entities, 'Franchise'),
     genres: mapGenres(getEntitiesByType(entities, 'Genre')),
@@ -54,11 +54,9 @@ export function createFilterFromEntities(entities: Object[]): VideoFilter {
     season: getEntityByType(entities, 'Season'),
     episode: getEntityByType(entities, 'Episode'),
   };
-
-  return filter;
 }
 
-export default async function remoteVideoPlayerHandler({ event, username }: AlexaHandlerRequest, kodiInstances: KodiInstances) {
+export default async function remoteVideoPlayerHandler({ event, username }: AlexaRequest, kodiInstances: KodiInstances) {
   const name = _.get(event, 'directive.header.name');
   const endpointId = _.get(event, 'directive.endpoint.endpointId');
 
@@ -66,10 +64,10 @@ export default async function remoteVideoPlayerHandler({ event, username }: Alex
 
   switch (name) {
     case 'SearchAndPlay':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'searchAndPlay', filter);
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'searchAndPlay', { filter });
       break;
     case 'SearchAndDisplayResults':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'searchAndDisplay', filter);
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'searchAndDisplay', { filter });
       break;
     default:
       throw new Error(`Unsupported RemoteVideoPlayer name: ${name}`);

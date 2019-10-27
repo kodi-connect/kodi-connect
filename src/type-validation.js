@@ -16,7 +16,7 @@ export function validateAccessTokenResponse(value: any): AccessTokenResponse {
   return value;
 }
 
-const validatorAwsRegion = yup.mixed().oneOf(['us', 'eu', 'fe']).required();
+const validatorAwsRegion = yup.mixed().oneOf(['us', 'eu', 'ap', 'ca', 'cn', 'sa']).required();
 export function validateAwsRegion(value: any): AwsRegion {
   validatorAwsRegion.isType(value);
   validatorAwsRegion.validateSync(value);

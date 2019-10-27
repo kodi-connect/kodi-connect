@@ -3,12 +3,10 @@
 import _ from 'lodash';
 import uuid from 'uuid/v4';
 import { kodiRpcCommand } from '../../tunnel-server';
-// import createLogger from '../../logging';
 
-import type { AlexaHandlerRequest } from './types';
+import type { AlexaRequest } from './types';
 import type { KodiInstances } from '../../tunnel-server';
-
-// const logger = createLogger('api/alexa/default-handler');
+import { transformState } from '../../util/alexa';
 
 type BaseState = { time: string };
 type VolumeState = { name: 'volume', value: number } & BaseState;
@@ -23,54 +21,7 @@ async function getState(kodiInstances: KodiInstances, username: string, endpoint
   return response.state.map(state => ({ ...state, time }));
 }
 
-const PLAYBACK_STATE_MAPPING = {
-  stopped: 'STOPPED',
-  paused: 'PAUSED',
-  playing: 'PLAYING',
-};
-
-function transformState(state: KodiState): ?Object {
-  switch (state.name) {
-    case 'volume':
-      return {
-        namespace: 'Alexa.Speaker',
-        name: 'volume',
-        value: state.value,
-        timeOfSample: state.time,
-        uncertaintyInMilliseconds: 0,
-      };
-    case 'muted':
-      return {
-        namespace: 'Alexa.Speaker',
-        name: 'muted',
-        value: state.value,
-        timeOfSample: state.time,
-        uncertaintyInMilliseconds: 0,
-      };
-    case 'player':
-      return {
-        namespace: 'Alexa.PlaybackStateReporter',
-        name: 'playbackState',
-        value: {
-          state: PLAYBACK_STATE_MAPPING[state.value],
-        },
-        timeOfSample: state.time,
-        uncertaintyInMilliseconds: 0,
-      };
-    case 'power':
-      return {
-        namespace: 'Alexa.PowerController',
-        name: 'powerState',
-        value: state.value ? 'ON' : 'OFF',
-        timeOfSample: '2017-02-03T16:20:50.52Z',
-        uncertaintyInMilliseconds: 0,
-      };
-    default:
-      return null;
-  }
-}
-
-async function stateReportHandler({ event, username }: AlexaHandlerRequest, kodiInstances: KodiInstances) {
+async function stateReportHandler({ event, username }: AlexaRequest, kodiInstances: KodiInstances) {
   const header = {
     messageId: uuid(),
     namespace: 'Alexa',
@@ -104,7 +55,7 @@ async function stateReportHandler({ event, username }: AlexaHandlerRequest, kodi
   };
 }
 
-export default async function defaultHandler(alexaHandlerEvent: AlexaHandlerRequest, kodiInstances: KodiInstances) {
+export default async function defaultHandler(alexaHandlerEvent: AlexaRequest, kodiInstances: KodiInstances) {
   const eventName = _.get(alexaHandlerEvent, 'event.directive.header.name');
 
   switch (eventName) {

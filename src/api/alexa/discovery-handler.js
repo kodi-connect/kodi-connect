@@ -5,7 +5,7 @@ import uuid from 'uuid/v4';
 import * as users from '../../users';
 
 import createLogger from '../../logging';
-import type { AlexaHandlerRequest } from './types';
+import type { AlexaRequest } from './types';
 import type { KodiInstances } from '../../tunnel-server';
 
 const logger = createLogger('api/alexa/discovery-handler');
@@ -43,7 +43,7 @@ async function getDevices(event: Object, username: string, kodiInstances: KodiIn
   return devicesWithCapabilities;
 }
 
-export default async function discoveryHandler({ event, username }: AlexaHandlerRequest, kodiInstances: KodiInstances) {
+export default async function discoveryHandler({ event, username }: AlexaRequest, kodiInstances: KodiInstances) {
   const header = {
     messageId: uuid(),
     name: 'Discover.Response',

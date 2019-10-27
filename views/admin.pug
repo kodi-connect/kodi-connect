@@ -7,21 +7,6 @@ block content
     h1 Devices
     if error
         p Error: #{error}
-    table.pt-table
-        thead
-            tr
-                th ID
-                th Invites remaining
-                th Actions
-        tbody
-            for skill in skills
-                include admin-alexa-skill.pug
-
-    div.pt-card
-        p Add Skill
-        div
-            form(method='POST' action='/admin/alexa-skill/add')
-                button.pt-button(type='submit' name='add') Add
 
     form(method='POST' action='/logout')
         button.pt-button(type='submit' name='logout') Logout

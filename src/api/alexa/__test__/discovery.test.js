@@ -1,7 +1,7 @@
 // @flow
 
 import { handler } from '../index';
-import { connectMongoose, closeMongoose } from './utils';
+import * as users from '../../../users';
 
 const event = {
   directive: {
@@ -21,15 +21,11 @@ const event = {
 };
 
 describe('Discovery', () => {
-  beforeAll(async () => {
-    await connectMongoose();
-  });
-
-  afterAll(async () => {
-    await closeMongoose();
-  });
-
   test('should discover devices', async () => {
+    jest
+      .spyOn(users, 'getDevices')
+      .mockImplementation(() => new Promise(resolve => resolve([])));
+
     const response = await handler({
       event,
       context: {},

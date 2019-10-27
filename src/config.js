@@ -7,7 +7,7 @@ function getHostUrl(): string {
 }
 
 const config = Object.freeze({
-  mongoConnectString: process.env.MONGO_URL,
+  mongoConnectString: process.env.MONGO_URL || (process.env.NODE_ENV === 'development' && 'mongodb://localhost:27017/kodi'),
 
   sessionSecret: process.env.SESSION_SECRET || (process.env.NODE_ENV === 'development' && 'TopSecret'),
 
@@ -27,7 +27,7 @@ const config = Object.freeze({
     ],
   ],
   amazonEventGatewayUrl: {
-    us: 'https://api.fe.amazonalexa.com/v3/events', // North America
+    us: 'https://api.amazonalexa.com/v3/events', // North America
     eu: 'https://api.eu.amazonalexa.com/v3/events', // Europe
     fe: 'https://api.fe.amazonalexa.com/v3/events', // Far East
   },

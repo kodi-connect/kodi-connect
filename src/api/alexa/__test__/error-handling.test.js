@@ -9,7 +9,7 @@ describe('Error handling', () => {
     const event = readEvent('play-comedy-mean-girls.json');
 
     jest
-      .spyOn(tunnelServer, 'kodiRpcCommand')
+      .spyOn(tunnelServer, 'asyncKodiRpcCommand')
       .mockImplementation(() => {
         throw new tunnelServer.DeviceUnreachableError();
       });
@@ -28,7 +28,7 @@ describe('Error handling', () => {
     const event = readEvent('play-comedy-mean-girls.json');
 
     jest
-      .spyOn(tunnelServer, 'kodiRpcCommand')
+      .spyOn(tunnelServer, 'asyncKodiRpcCommand')
       .mockImplementation(() => {
         throw new tunnelServer.DeviceUnknownCommand();
       });

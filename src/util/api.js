@@ -8,6 +8,7 @@ const logger = createLogger('utils');
 
 export class ApiError extends Error {
   status: number;
+
   response: ?Object;
 
   constructor(inStatus?: number, response?: Object) {

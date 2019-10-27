@@ -10,6 +10,7 @@ import config from '../config';
 import createLogger from '../logging';
 
 import type { AwsRegion } from '../types';
+import { REGION_GATEWAY_MAP } from '../ask/constants';
 
 type BaseState = { time: string };
 type VolumeState = { name: 'volume', value: number } & BaseState;
@@ -118,9 +119,14 @@ export function createChangeReportEvent(
 }
 
 export async function sendAlexaEvent(region: AwsRegion, event: Object) {
-  const url = config.amazonEventGatewayUrl[region];
+  const alexaGatewayRegion = REGION_GATEWAY_MAP[region];
+  if (!alexaGatewayRegion) {
+    logger.error('Failed to map AwsRegion to AwsAlexaGatewayRegion', { region });
+    return;
+  }
+  const url = config.amazonEventGatewayUrl[alexaGatewayRegion];
 
-  if (!url) throw new Error(`Invalid region: ${region}`);
+  if (!url) throw new Error(`Invalid region: ${alexaGatewayRegion}`);
 
   let response;
   try {

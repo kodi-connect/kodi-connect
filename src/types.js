@@ -1,6 +1,7 @@
 // @flow
 
-export type AwsRegion = 'us' | 'eu' | 'fe';
+export type AwsAlexaGatewayRegion = 'us' | 'eu' | 'fe';
+export type AwsRegion = 'us' | 'eu' | 'ap' | 'ca' | 'cn' | 'sa';
 
 type AmazonTokensBase = {
   access_token: string,

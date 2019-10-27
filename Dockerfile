@@ -1,4 +1,4 @@
-FROM node:8.9.4-alpine
+FROM node:12.12.0-alpine
 
 ARG GIT_HASH
 LABEL githash=${GIT_HASH}

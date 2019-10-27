@@ -2,9 +2,9 @@
 
 import _ from 'lodash';
 import uuid from 'uuid/v4';
-import { kodiRpcCommand } from '../../tunnel-server';
+import { asyncKodiRpcCommand } from '../../tunnel-server';
 
-import type { AlexaHandlerRequest } from './types';
+import type { AlexaRequest } from './types';
 import type { KodiInstances } from '../../tunnel-server';
 
 type PowerState = 'ON' | 'OFF';
@@ -19,7 +19,7 @@ function createPowerStateProperty(powerState: PowerState): Object {
   };
 }
 
-export default async function powerControllerHandler({ event, username }: AlexaHandlerRequest, kodiInstances: KodiInstances) {
+export default async function powerControllerHandler({ event, username }: AlexaRequest, kodiInstances: KodiInstances) {
   const header = {
     messageId: uuid(),
     name: 'Response',
@@ -41,11 +41,11 @@ export default async function powerControllerHandler({ event, username }: AlexaH
 
   switch (powerOperation) {
     case 'TurnOff':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'turnOff');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'turnOff');
       powerState = 'OFF';
       break;
     case 'TurnOn':
-      await kodiRpcCommand(kodiInstances, username, endpointId, 'turnOn');
+      await asyncKodiRpcCommand(kodiInstances, username, endpointId, 'turnOn');
       powerState = 'ON';
       break;
     default:

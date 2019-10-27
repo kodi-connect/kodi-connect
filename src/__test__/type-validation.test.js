@@ -42,9 +42,9 @@ describe('Amazon types', () => {
   });
 
   test('AwsRegion', () => {
-    const valid: AwsRegion[] = ['us', 'eu', 'fe'];
+    const valid: AwsRegion[] = ['us', 'eu', 'ap', 'ca', 'cn', 'sa'];
 
-    const invalid = ['', 'abc', 'ap', 'ca', 'cn', 'sa', null, undefined, {}, [], ['us', 'eu'], ['us']];
+    const invalid = ['', 'fe', 'xyz', null, undefined, {}, [], ['us', 'eu'], ['us']];
 
     validate(valid, invalid, validateAwsRegion);
   });
