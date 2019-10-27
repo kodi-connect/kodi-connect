@@ -32,7 +32,7 @@ export default async function authorizationHandler({ event, meta, username }: Al
   switch (authorizationOperation) {
     case 'AcceptGrant': {
       const grantCode = _.get(event, 'directive.payload.grant.code');
-      const regionValue = _.get(meta, 'region');
+      const regionValue = _.get(meta, 'region', 'us-east-1').split('-')[0];
       let region: AwsRegion;
 
       try {

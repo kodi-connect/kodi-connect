@@ -8,7 +8,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: node-modules-{{ checksum ".circleci/config.yml" }}-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
+          key: node-modules-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
 
       - run:
           name: Print versions
@@ -19,7 +19,7 @@ jobs:
           command: yarn install
 
       - save_cache:
-          key: node-modules-{{ checksum ".circleci/config.yml" }}-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
+          key: node-modules-{{ checksum "yarn.lock" }}-{{ checksum "package.json" }}
           paths:
             - node_modules
 
@@ -41,17 +41,13 @@ jobs:
 
   image:
       docker:
-        - image: node:12.11.1
+        - image: docker:latest
 
       steps:
         - setup_remote_docker:
             version: 18.09.3
 
         - checkout
-
-        - run:
-            name: Install Docker
-            command: curl -fsSL get.docker.com | bash
 
         - run:
             name: Docker login
@@ -71,6 +67,8 @@ jobs:
               if [ "$CIRCLE_BRANCH" = "master" ]; then
                 docker tag kodiconnect/kodi-connect:${CIRCLE_BRANCH} kodiconnect/kodi-connect:latest
                 docker push kodiconnect/kodi-connect:latest
+              else
+                echo "Skipping step"
               fi
 
 workflows:
