@@ -57,7 +57,11 @@ jobs:
               else
                 echo "export IMAGE_TAG='$(echo "${CIRCLECI_BRANCH}" | sed 'sx/x-xg')'" >> $BASH_ENV
               fi
-        - run: export
+        - run:
+            name: Export
+            command: |
+              source $BASH_ENV
+              export
 
         - run:
             name: Docker login
@@ -65,11 +69,15 @@ jobs:
 
         - run:
             name: Build image
-            command: docker build -t kodiconnect/kodi-connect:${IMAGE_TAG} .
+            command: |
+              source $BASH_ENV
+              docker build -t kodiconnect/kodi-connect:${IMAGE_TAG} .
 
         - run:
             name: Push image
-            command: docker push kodiconnect/kodi-connect:${IMAGE_TAG}
+            command: |
+              source $BASH_ENV
+              docker push kodiconnect/kodi-connect:${IMAGE_TAG}
 
 workflows:
   version: 2
