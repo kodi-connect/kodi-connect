@@ -57,6 +57,7 @@ jobs:
               else
                 echo "export IMAGE_TAG='$(echo "${CIRCLECI_BRANCH}" | sed 'sx/x-xg')'" >> $BASH_ENV
               fi
+        - run: export
 
         - run:
             name: Docker login
