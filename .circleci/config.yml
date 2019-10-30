@@ -50,26 +50,25 @@ jobs:
         - checkout
 
         - run:
+            name: Setup environment
+            command: |
+              if [ "$CIRCLE_BRANCH" = "master" ]; then
+                echo "export IMAGE_TAG='latest'" >> $BASH_ENV
+              else
+                echo "export IMAGE_TAG='$(echo "${CIRCLECI_BRANCH}" | sed 'sx/x-xg')'" >> $BASH_ENV
+              fi
+
+        - run:
             name: Docker login
             command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
 
         - run:
             name: Build image
-            command: docker build -t kodiconnect/kodi-connect:${CIRCLE_BRANCH} .
+            command: docker build -t kodiconnect/kodi-connect:${IMAGE_TAG} .
 
         - run:
             name: Push image
-            command: docker push kodiconnect/kodi-connect:${CIRCLE_BRANCH}
-
-        - run:
-            name: Push latest image
-            command: |
-              if [ "$CIRCLE_BRANCH" = "master" ]; then
-                docker tag kodiconnect/kodi-connect:${CIRCLE_BRANCH} kodiconnect/kodi-connect:latest
-                docker push kodiconnect/kodi-connect:latest
-              else
-                echo "Skipping step"
-              fi
+            command: docker push kodiconnect/kodi-connect:${IMAGE_TAG}
 
 workflows:
   version: 2
@@ -79,3 +78,8 @@ workflows:
       - image:
           requires:
             - test
+          filters:
+            branches:
+              ignore:
+                - /^dependabot\/.*/
+
