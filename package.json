@@ -23,7 +23,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "bugsnag": "^2.4.3",
-    "connect-mongo": "^2.0.0",
+    "connect-mongo": "^3.1.1",
     "express": "^4.16.2",
     "express-oauth-server": "^2.0.0",
     "express-session": "^1.15.6",
