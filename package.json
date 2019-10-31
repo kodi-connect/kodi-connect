@@ -34,7 +34,7 @@
     "rand-token": "^0.4.0",
     "uuid": "^3.1.0",
     "ws": "^3.3.3",
-    "yup": "^0.26.3"
+    "yup": "^0.27.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",
