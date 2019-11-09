@@ -55,13 +55,13 @@ jobs:
 
         - run:
             name: Build image
-            command: docker build -t kodiconnect/kodi-connect:${CIRCLECI_BRANCH} .
+            command: docker build -t kodiconnect/kodi-connect:${CIRCLE_BRANCH} .
 
         - run: mkdir -p /tmp/image
 
         - run:
             name: Save image
-            command: docker save kodiconnect/kodi-connect:${CIRCLECI_BRANCH} | gzip > /tmp/image/image.tar.gz
+            command: docker save kodiconnect/kodi-connect:${CIRCLE_BRANCH} | gzip > /tmp/image/image.tar.gz
 
         - persist_to_workspace:
             root: /tmp/image
@@ -82,7 +82,7 @@ jobs:
 
       - run:
           name: Push image
-          command: docker push kodiconnect/kodi-connect:${CIRCLECI_BRANCH}
+          command: docker push kodiconnect/kodi-connect:${CIRCLE_BRANCH}
 
 workflows:
   version: 2
