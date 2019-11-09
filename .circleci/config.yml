@@ -50,34 +50,39 @@ jobs:
         - checkout
 
         - run:
-            name: Setup environment
-            command: |
-              if [ "$CIRCLE_BRANCH" = "master" ]; then
-                echo "export IMAGE_TAG='latest'" >> $BASH_ENV
-              else
-                echo "export IMAGE_TAG='$(echo "${CIRCLECI_BRANCH}" | sed 'sx/x-xg')'" >> $BASH_ENV
-              fi
-        - run:
-            name: Export
-            command: |
-              source $BASH_ENV
-              export
-
-        - run:
             name: Docker login
             command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
 
         - run:
             name: Build image
-            command: |
-              source $BASH_ENV
-              docker build -t kodiconnect/kodi-connect:${IMAGE_TAG} .
+            command: docker build -t kodiconnect/kodi-connect:${CIRCLECI_BRANCH} .
+
+        - run: mkdir -p /tmp/image
 
         - run:
-            name: Push image
-            command: |
-              source $BASH_ENV
-              docker push kodiconnect/kodi-connect:${IMAGE_TAG}
+            name: Save image
+            command: docker save kodiconnect/kodi-connect:${CIRCLECI_BRANCH} | gzip > /tmp/image/image.tar.gz
+
+        - persist_to_workspace:
+            root: /tmp/image
+            paths:
+              - image.tar.gz
+
+  publish:
+    docker:
+      - image: docker:latest
+
+    steps:
+      - attach_workspace:
+          at: /tmp/image
+
+      - run:
+          name: Load image
+          command: docker load --input /tmp/image/image.tar.gz
+
+      - run:
+          name: Push image
+          command: docker push kodiconnect/kodi-connect:${CIRCLECI_BRANCH}
 
 workflows:
   version: 2
@@ -91,4 +96,7 @@ workflows:
             branches:
               ignore:
                 - /^dependabot\/.*/
+      - publish:
+          requires:
+            - image
 
