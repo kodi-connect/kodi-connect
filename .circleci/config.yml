@@ -89,12 +89,12 @@ jobs:
           command: |
             sudo apt-get update && sudo apt-get install -y --no-install-recommends jq
 
-      - run
+      - run:
           name: Run integration tests
+          command: IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH} docker-compose run --service-ports --rm alexa
           environment:
             ADDON_VERSION: 0.2.0
             ALEXA_VERSION: 1.0
-          command: IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH} docker-compose run --service-ports --rm alexa
 
   publish:
     docker:
@@ -132,7 +132,7 @@ workflows:
               ignore:
                 - /^dependabot\/.*/
       - integration_test:
-          required:
+          requires:
             - image
       - publish:
           requires:
