@@ -87,21 +87,26 @@ jobs:
           command: docker load --input /tmp/image/image.tar.gz
 
       - run:
-          name: Build docker images
+          name: Build and pull docker images
           command: |
-            cd tests/integration && \
-            IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH} \
-            ADDON_VERSION=0.2.0 \
-            ALEXA_VERSION=1.0 \
+            export IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH}
+            export ADDON_VERSION=0.2.0
+            export ALEXA_VERSION=1.0
+
+            cd tests/integration
+
             docker-compose build
+            docker-compose pull
 
       - run:
           name: Run integration tests
           command: |
-            cd tests/integration && \
-            IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH} \
-            ADDON_VERSION=0.2.0 \
-            ALEXA_VERSION=1.0 \
+            export IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH}
+            export ADDON_VERSION=0.2.0
+            export ALEXA_VERSION=1.0
+
+            cd tests/integration
+            
             docker-compose run --service-ports --rm alexa
 
   publish:
