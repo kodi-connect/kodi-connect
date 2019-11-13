@@ -23,6 +23,7 @@ import { isLoggedInMiddleware } from './routes/util';
 
 const logger = createLogger('index');
 
+mongoose.set('debug', true);
 const MongoStore = connectMongo(session);
 
 mongoose.connect(config.mongoConnectString, (error) => {
