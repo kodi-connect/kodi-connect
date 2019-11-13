@@ -87,6 +87,15 @@ jobs:
           command: docker load --input /tmp/image/image.tar.gz
 
       - run:
+          name: Build docker images
+          command: |
+            cd tests/integration && \
+            IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH} \
+            ADDON_VERSION=0.2.0 \
+            ALEXA_VERSION=1.0 \
+            docker-compose build
+
+      - run:
           name: Run integration tests
           command: |
             cd tests/integration && \
