@@ -85,11 +85,6 @@ jobs:
           command: docker load --input /tmp/image/image.tar.gz
 
       - run:
-          name: Install jq
-          command: |
-            sudo apt-get update && sudo apt-get install -y --no-install-recommends jq
-
-      - run:
           name: Run integration tests
           command: cd tests/integration && IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH} docker-compose run --service-ports --rm alexa
           environment:
