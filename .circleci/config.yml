@@ -106,7 +106,7 @@ jobs:
             export ALEXA_VERSION=1.0
 
             cd tests/integration
-            
+
             docker-compose run --service-ports --rm alexa
 
   publish:
