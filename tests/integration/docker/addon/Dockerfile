@@ -21,8 +21,6 @@ RUN curl --fail -L https://kodi-connect.s3.eu-central-1.amazonaws.com/kodi-conne
 RUN git clone https://github.com/kodi-connect/kodi-connect-addon.git /tmp/kodi-connect-addon && \
     cp -r /tmp/kodi-connect-addon/mock/ $HOME/app/
 
-ADD ./xbmc.py $HOME/app/mock/xbmc.py
-
 WORKDIR $HOME/app
 USER python
 
