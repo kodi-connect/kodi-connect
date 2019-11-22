@@ -26,7 +26,7 @@ services:
   server:
     image: ${IMAGE_NAME}
     environment:
-      HOST_URL: http://localhost:3005
+      HOST_URL: http://server:3005
       SESSION_SECRET: muchsecret
       MONGO_URL: mongodb://mongo:27017/kodi
       CUSTOM_REDIRECT_URI: http://localhost:3005/oauth/redirect_uri

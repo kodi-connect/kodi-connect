@@ -1,0 +1,37 @@
+version: '2.4'
+services:
+  mongo:
+    image: mongo:3.6.1
+    healthcheck:
+      test: "mongo --quiet localhost/kodi --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  server:
+    image: ${IMAGE_NAME}
+    environment:
+      HOST_URL: http://server:3005
+      SESSION_SECRET: muchsecret
+      MONGO_URL: mongodb://mongo:27017/kodi
+      CUSTOM_REDIRECT_URI: http://localhost:3005/oauth/redirect_uri
+      CLIENT_ID: clientid
+      CLIENT_SECRET: clientsecret
+      DUMMY_EMAIL: 1
+    # ports:
+    #   - 3005:3005
+    depends_on:
+      mongo:
+        condition: service_healthy
+  tests:
+    build:
+      context: .
+    environment:
+      KODI_CONNECT_URL: 'http://server:3005'
+      MONGO_URL: mongodb://mongo:27017/kodi
+    volumes:
+      - ./tests:/home/node/app/tests
+    command: jest --detectOpenHandles ./tests
+    # working_dir: /home/node/app/tests
+    depends_on:
+      server:
+        condition: service_started

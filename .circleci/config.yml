@@ -108,6 +108,47 @@ jobs:
             cd tests/integration
 
             docker-compose run --service-ports --rm alexa
+  
+  api_test:
+    machine:
+      image: circleci/classic:latest
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install latest docker-compose
+          command: |
+            export COMPOSE_URL="https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/docker-compose-latest"
+            sudo rm -fr /usr/local/bin/docker-compose
+            sudo curl --silent --show-error --location --fail --retry 3 --output /usr/bin/docker-compose $COMPOSE_URL
+            sudo chmod +x /usr/bin/docker-compose
+
+      - attach_workspace:
+          at: /tmp/image
+
+      - run:
+          name: Load image
+          command: docker load --input /tmp/image/image.tar.gz
+
+      - run:
+          name: Build and pull docker images
+          command: |
+            export IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH}
+
+            cd tests/api
+
+            docker-compose build
+            docker-compose pull
+
+      - run:
+          name: Run API tests
+          command: |
+            export IMAGE_NAME=kodiconnect/kodi-connect:${CIRCLE_BRANCH}
+
+            cd tests/api
+
+            docker-compose run --service-ports --rm tests
 
   publish:
     docker:
@@ -147,8 +188,12 @@ workflows:
       - integration_test:
           requires:
             - image
+      - api_test:
+          requires:
+            - image
       - publish:
           requires:
             - image
             - integration_test
+            - api_test
 
