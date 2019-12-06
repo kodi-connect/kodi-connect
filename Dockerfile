@@ -16,8 +16,6 @@ RUN yarn install
 COPY . $HOME/app
 RUN yarn run build
 
-USER node
-
 ########################################
 FROM node:12.12.0 as prod
 
@@ -31,8 +29,6 @@ WORKDIR $HOME/app
 COPY package.json yarn.lock $HOME/app/
 RUN yarn install
 
-COPY static $HOME/app/static
-COPY views $HOME/app/views
 COPY --from=builder $HOME/app/build $HOME/app/build
 
 RUN chown -R node:node $HOME/app
