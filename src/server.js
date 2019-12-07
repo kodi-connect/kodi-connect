@@ -1,3 +1,4 @@
+import path from 'path';
 import mongoose from 'mongoose';
 import connectMongo from 'connect-mongo';
 import session from 'express-session';
@@ -41,11 +42,12 @@ export default function createServer() {
   const app = express();
   const server = http.createServer(app);
 
-  app.use('/static', express.static('static'));
+  app.use('/static', express.static(path.join(__dirname, 'static')));
 
   const kodiInstances = createTunnelServer(server, '/ws');
 
   app.set('view engine', 'pug');
+  app.set('views', path.join(__dirname, 'views'));
 
   app.use(session({
     secret: config.sessionSecret,
