@@ -103,7 +103,7 @@ jobs:
             cd tests/integration
 
             docker-compose build
-            docker-compose pull
+            docker-compose pull mongo mongo-seed kodi
 
       - run:
           name: Run integration tests
@@ -146,7 +146,7 @@ jobs:
             cd tests/api
 
             docker-compose build
-            docker-compose pull
+            docker-compose pull mongo
 
       - run:
           name: Run API tests
