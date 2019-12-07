@@ -188,7 +188,7 @@ jobs:
       
       - run:
           name: Tag image
-          command: docker tag kodiconnect/kodi-connect:${CIRCLE_SHA1}-${CIRCLE_BUILD_NUM} kodiconnect/kodi-connect:${CIRCLE_BRANCH}
+          command: docker tag "$(cat /tmp/workspace/image_name)" kodiconnect/kodi-connect:${CIRCLE_BRANCH}
 
       - run:
           name: Push image
