@@ -115,6 +115,11 @@ jobs:
             cd tests/integration
 
             docker-compose run --service-ports --rm alexa
+      
+      - run:
+          name: Print logs
+          when: always
+          command: docker-compose logs
   
   api_test:
     machine:
@@ -156,6 +161,11 @@ jobs:
             cd tests/api
 
             docker-compose run --service-ports --rm tests
+      
+      - run:
+          name: Print logs
+          when: always
+          command: docker-compose logs
 
   publish:
     docker:
