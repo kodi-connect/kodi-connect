@@ -1,0 +1,14 @@
+pull_request_rules:
+  - name: automatic merge for Dependabot pull requests
+    conditions:
+      - author=dependabot[bot]
+      - 'status-success=ci/circleci: test'
+      - 'status-success=ci/circleci: image'
+      - 'status-success=ci/circleci: integration_test'
+      - 'status-success=ci/circleci: api_test'
+      - 'status-success=ci/circleci: publish'
+    actions:
+      merge:
+        method: merge
+        strict: true
+      delete_head_branch:
