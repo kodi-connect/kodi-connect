@@ -6,7 +6,6 @@ pull_request_rules:
       - 'status-success=ci/circleci: image'
       - 'status-success=ci/circleci: integration_test'
       - 'status-success=ci/circleci: api_test'
-      - 'status-success=ci/circleci: publish'
     actions:
       merge:
         method: merge
