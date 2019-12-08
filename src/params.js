@@ -5,7 +5,7 @@ import mongoose, { Schema } from 'mongoose';
 const ParamsSchema = new Schema({
   name: { type: String, required: true, unique: true },
   value: { type: Object },
-});
+}, { collection: 'Params' });
 
 mongoose.model('Params', ParamsSchema);
 

@@ -1,0 +1,91 @@
+version: '2.4'
+services:
+  mongo:
+    image: mongo:3.6.1
+    healthcheck:
+      test: "mongo --quiet localhost/kodi --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  mongo-seed:
+    image: mongo:3.6.1
+    command: "mongo --quiet mongo/kodi --eval 'db.Users.update({\"username\":\"test@email.com\"},{\"username\":\"test@email.com\",\"password\":\"$$2a$$10$$3cSUOhCwQ2SVxzmiMdlBq.HbY7ZtTO20k.6v3ooU2RcxNJ8l/jIGm\",\"activated\":true,\"devices\":[{\"id\":\"d965a9d3-45a3-4044-88bc-3439fdf81757\",\"name\":\"Kodi\",\"secret\":\"muchsecret\"}]},{\"upsert\":true})'"
+    depends_on:
+      mongo:
+        condition: service_healthy
+  kodi:
+    image: tkislan/kodi-simulator
+    ports:
+      - '8080:8080'
+      - '5900:5900'
+    healthcheck:
+      test: 'curl -X "POST" "http://localhost:8080/jsonrpc" -H "Content-Type: application/json; charset=utf-8" -u "kodi:password" -d "{\"jsonrpc\": \"2.0\",\"id\": \"1\",\"method\": \"VideoLibrary.GetMovies\",\"params\": {\"properties\": [\"title\"]}}"'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  server:
+    image: ${IMAGE_NAME}
+    environment:
+      HOST_URL: http://server:3005
+      SESSION_SECRET: muchsecret
+      MONGO_URL: mongodb://mongo:27017/kodi
+      CUSTOM_REDIRECT_URI: http://localhost:3005/oauth/redirect_uri
+      CLIENT_ID: clientid
+      CLIENT_SECRET: clientsecret
+      DUMMY_EMAIL: 1
+      ALLOW_OAUTH_PASSWORD: 1
+    ports:
+      - 3005:3005
+    depends_on:
+      mongo:
+        condition: service_healthy
+      mongo-seed:
+        condition: service_started
+  addon:
+    build:
+      context: ./docker/addon
+      args:
+        VERSION: ${ADDON_VERSION}
+    environment:
+      KODI_CONNECT_URL: ws://server:3005/ws
+      PYTHONPATH: /home/python/app/mock:/home/python/app/resources:/home/python/app/resources/lib
+      KODI_HOST: http://kodi:8080
+      EMAIL: test@email.com
+      SECRET: muchsecret
+      PYTHONUNBUFFERED: 1
+      LOG_FILE: /tmp/kodilog/kodi.log
+    volumes:
+      - kodi-log-volume:/tmp/kodilog/
+    command: python service.py
+    healthcheck:
+      test: test ! -z "$$(netstat -utw | grep _server:3005)"
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      server:
+        condition: service_started
+      kodi:
+        condition: service_healthy
+      mongo-seed:
+        condition: service_started
+  alexa:
+    build:
+      context: ./docker/alexa
+      args:
+        VERSION: ${ALEXA_VERSION}
+    environment:
+      KODI_CONNECT_URL: 'http://server:3005'
+    volumes:
+      - ./tests:/home/node/app/tests
+      - kodi-log-volume:/tmp/kodilog/
+    command: jest ./tests
+    depends_on:
+      server:
+        condition: service_started
+      addon:
+        condition: service_healthy
+      mongo-seed:
+        condition: service_started
+volumes:
+  kodi-log-volume:
