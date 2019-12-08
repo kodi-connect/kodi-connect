@@ -49,35 +49,150 @@ jobs:
 
         - checkout
 
-        - run:
-            name: Setup environment
-            command: |
-              if [ "$CIRCLE_BRANCH" = "master" ]; then
-                echo "export IMAGE_TAG='latest'" >> $BASH_ENV
-              else
-                echo "export IMAGE_TAG='$(echo "${CIRCLECI_BRANCH}" | sed 'sx/x-xg')'" >> $BASH_ENV
-              fi
-        - run:
-            name: Export
-            command: |
-              source $BASH_ENV
-              export
+        - run: 
+            name: Create workspace dir
+            command: mkdir -p /tmp/workspace
 
         - run:
-            name: Docker login
-            command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
+            name: Generate image name
+            command: echo -n "kodiconnect/kodi-connect:${CIRCLE_SHA1}-${CIRCLE_BUILD_NUM}" > /tmp/workspace/image_name
 
         - run:
             name: Build image
-            command: |
-              source $BASH_ENV
-              docker build -t kodiconnect/kodi-connect:${IMAGE_TAG} .
+            command: docker build -t "$(cat /tmp/workspace/image_name)" .
 
         - run:
-            name: Push image
-            command: |
-              source $BASH_ENV
-              docker push kodiconnect/kodi-connect:${IMAGE_TAG}
+            name: Save image
+            command: docker save "$(cat /tmp/workspace/image_name)" | gzip > /tmp/workspace/image.tar.gz
+
+        - persist_to_workspace:
+            root: /tmp/workspace
+            paths:
+              - image_name
+              - image.tar.gz
+
+  integration_test:
+    machine:
+      image: circleci/classic:latest
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install latest docker-compose
+          command: |
+            export COMPOSE_URL="https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/docker-compose-latest"
+            sudo rm -fr /usr/local/bin/docker-compose
+            sudo curl --silent --show-error --location --fail --retry 3 --output /usr/bin/docker-compose $COMPOSE_URL
+            sudo chmod +x /usr/bin/docker-compose
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run:
+          name: Load image
+          command: docker load --input /tmp/workspace/image.tar.gz
+
+      - run:
+          name: Build and pull docker images
+          command: |
+            export IMAGE_NAME="$(cat /tmp/workspace/image_name)"
+            export ADDON_VERSION=0.2.0
+            export ALEXA_VERSION=1.0
+
+            cd tests/integration
+
+            docker-compose build
+            docker-compose pull mongo mongo-seed kodi
+
+      - run:
+          name: Run integration tests
+          command: |
+            export IMAGE_NAME="$(cat /tmp/workspace/image_name)"
+            export ADDON_VERSION=0.2.0
+            export ALEXA_VERSION=1.0
+
+            cd tests/integration
+
+            docker-compose run --service-ports --rm alexa
+      
+      - run:
+          name: Print logs
+          when: always
+          command: docker-compose logs
+  
+  api_test:
+    machine:
+      image: circleci/classic:latest
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install latest docker-compose
+          command: |
+            export COMPOSE_URL="https://circle-downloads.s3.amazonaws.com/circleci-images/cache/linux-amd64/docker-compose-latest"
+            sudo rm -fr /usr/local/bin/docker-compose
+            sudo curl --silent --show-error --location --fail --retry 3 --output /usr/bin/docker-compose $COMPOSE_URL
+            sudo chmod +x /usr/bin/docker-compose
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run:
+          name: Load image
+          command: docker load --input /tmp/workspace/image.tar.gz
+
+      - run:
+          name: Build and pull docker images
+          command: |
+            export IMAGE_NAME="$(cat /tmp/workspace/image_name)"
+
+            cd tests/api
+
+            docker-compose build
+            docker-compose pull mongo
+
+      - run:
+          name: Run API tests
+          command: |
+            export IMAGE_NAME="$(cat /tmp/workspace/image_name)"
+
+            cd tests/api
+
+            docker-compose run --service-ports --rm tests
+      
+      - run:
+          name: Print logs
+          when: always
+          command: docker-compose logs
+
+  publish:
+    docker:
+      - image: docker:latest
+
+    steps:
+      - setup_remote_docker:
+          version: 18.09.3
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run:
+          name: Docker login
+          command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
+
+      - run:
+          name: Load image
+          command: docker load --input /tmp/workspace/image.tar.gz
+      
+      - run:
+          name: Tag image
+          command: docker tag "$(cat /tmp/workspace/image_name)" kodiconnect/kodi-connect:${CIRCLE_BRANCH}
+
+      - run:
+          name: Push image
+          command: docker push kodiconnect/kodi-connect:${CIRCLE_BRANCH}
 
 workflows:
   version: 2
@@ -91,4 +206,15 @@ workflows:
             branches:
               ignore:
                 - /^dependabot\/.*/
+      - integration_test:
+          requires:
+            - image
+      - api_test:
+          requires:
+            - image
+      - publish:
+          requires:
+            - image
+            - integration_test
+            - api_test
 

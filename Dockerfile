@@ -1,22 +1,37 @@
-FROM node:12.12.0-alpine
-
 ARG GIT_HASH
+
+########################################
+FROM node:12.12.0 as builder
+
+ENV HOME=/home/node
+WORKDIR $HOME/app
+
+RUN ln -sf /usr/share/zoneinfo/Europe/Bratislava /etc/localtime && \
+  dpkg-reconfigure -f noninteractive tzdata && \
+  apt-get update && apt-get install -y git
+
+COPY package.json yarn.lock $HOME/app/
+RUN yarn install
+
+COPY . $HOME/app
+RUN yarn run build
+
+########################################
+FROM node:12.12.0 as prod
+
 LABEL githash=${GIT_HASH}
 
 ENV GIT_HASH=${GIT_HASH}
+ENV NODE_ENV=production
 ENV HOME=/home/node
-
 WORKDIR $HOME/app
 
-COPY . $HOME/app
+COPY package.json yarn.lock $HOME/app/
+RUN yarn install
 
-RUN yarn install && \
-  yarn run build && \
-  rm -rf node_modules && \
-  NODE_ENV=production yarn install && \
-  chown -R node:node $HOME/app
+COPY --from=builder $HOME/app/build $HOME/app/build
 
-ENV NODE_ENV=production
+RUN chown -R node:node $HOME/app
 
 USER node
 CMD ["yarn", "start"]

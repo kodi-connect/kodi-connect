@@ -1,4 +1,4 @@
-## Steps to join Beta Test
+## Steps to create
 
 Navigate to [https://kodiconnect.kislan.sk](https://kodiconnect.kislan.sk)
 
