@@ -2224,10 +2224,10 @@ confusing-browser-globals@^1.0.7:
   resolved "https://registry.yarnpkg.com/confusing-browser-globals/-/confusing-browser-globals-1.0.9.tgz#72bc13b483c0276801681871d4898516f8f54fdd"
   integrity sha512-KbS1Y0jMtyPgIxjO7ZzMAuUpAKMt1SzCL9fsrKsX6b0zJPTaT0SiSPmewwVZg9UAO83HVIlEhZF84LIjZ0lmAw==
 
-connect-mongo@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/connect-mongo/-/connect-mongo-3.1.1.tgz#c5f34a4bda30d5e9c855f45b58260ad887bd77e9"
-  integrity sha512-kXG1tBHXkzYJd1+oLUX5Q0Xp3wrBaFC24/3Bqvne6yLfVq3Urc/Qg9TdVge9MEEQ7Q8cirB5vDj85qsrAaPPyg==
+connect-mongo@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/connect-mongo/-/connect-mongo-3.2.0.tgz#20f776c7f2a9d8144fc76cfdcbf33edb05eb4d52"
+  integrity sha512-0Mx88079Z20CG909wCFlR3UxhMYGg6Ibn1hkIje1hwsqOLWtL9HJV+XD0DAjUvQScK6WqY/FA8tSVQM9rR64Rw==
   dependencies:
     mongodb "^3.1.0"
 
