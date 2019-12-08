@@ -19,7 +19,7 @@ type ConfirmationResult = 'confirmed' | 'already_confirmed' | 'not_found';
 
 if (!config.hostUrl) throw new Error('HOST_URL not defined');
 
-if (process.env.NODE_ENV !== 'development') {
+if (!config.dummyEmail) {
   if (!config.emailAddress) throw new Error('EMAIL_ADDRESS not defined');
   if (!config.emailPassword) throw new Error('EMAIL_PASSWORD not defined');
 }
@@ -50,7 +50,7 @@ const UserSchema = new Schema({
     expires_at: Number,
     region: String,
   },
-});
+}, { collection: 'Users' });
 
 UserSchema.index({ username: 1, 'devices.name': 1 }, { unique: true });
 
@@ -67,7 +67,7 @@ const mailSender = nodemailer.createTransport({
 });
 
 function sendConfirmationEmail(username: string, confirmationToken: string) {
-  if (process.env.NODE_ENV === 'development') {
+  if (config.dummyEmail) {
     logger.debug('***** CONFIRMATION EMAIL *****');
     logger.debug(`${config.hostUrl}/confirm/${confirmationToken}`);
     logger.debug('******************************');
