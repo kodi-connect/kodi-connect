@@ -3,7 +3,7 @@
 import config from '../config';
 import type { AwsAlexaGatewayRegion, AwsRegion } from '../types';
 
-const LOCALES = [
+const LOCALES: string[] = [
   'en-US',
   'en-GB',
   'en-AU',
