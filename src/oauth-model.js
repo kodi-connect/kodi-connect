@@ -8,6 +8,8 @@ import mongoose, { Schema } from 'mongoose';
 
 import createLogger from './logging';
 
+import config from './config';
+
 export { getUser } from './users';
 
 const logger = createLogger('oauth-model');
@@ -27,7 +29,7 @@ mongoose.model('OAuthAuthorizationCode', new Schema({
   user: new Schema({
     username: { type: String },
   }),
-}));
+}, { collection: 'OAuthAuthorizationCode' }));
 
 mongoose.model('OAuthTokens', new Schema({
   accessToken: { type: String },
@@ -38,7 +40,7 @@ mongoose.model('OAuthTokens', new Schema({
   refreshTokenExpiresAt: { type: Date },
   user: { type: Object },
   userId: { type: String },
-}));
+}, { collection: 'OAuthTokens' }));
 
 const OAuthTokensModel = mongoose.model('OAuthTokens');
 const OAuthAuthorizationCodeModel = mongoose.model('OAuthAuthorizationCode');
@@ -66,7 +68,7 @@ export async function getClient(clientId: string, clientSecret: string) {
   // return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
   logger.debug('getClient', { clientId, clientSecret });
 
-  const client = {
+  let client = {
     id: 'abcdefghijklmnopqrstuvwxyz',
     grants: ['authorization_code', 'refresh_token'],
     redirectUris: [
@@ -77,8 +79,8 @@ export async function getClient(clientId: string, clientSecret: string) {
     ],
   };
 
-  if (process.env.NODE_ENV === 'development') {
-    return {
+  if (config.allowOauthPassword) {
+    client = {
       ...client,
       grants: [...client.grants, 'password'],
     };
