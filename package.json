@@ -28,7 +28,7 @@
     "express-oauth-server": "^2.0.0",
     "express-session": "^1.15.6",
     "lodash": "^4.17.15",
-    "mongoose": "^5.7.7",
+    "mongoose": "^5.7.13",
     "nodemailer": "^4.4.1",
     "pug": "^2.0.0-rc.4",
     "rand-token": "^0.4.0",

@@ -202,10 +202,6 @@ workflows:
       - image:
           requires:
             - test
-          filters:
-            branches:
-              ignore:
-                - /^dependabot\/.*/
       - integration_test:
           requires:
             - image
@@ -217,4 +213,8 @@ workflows:
             - image
             - integration_test
             - api_test
+          filters:
+            branches:
+              ignore:
+                - /^dependabot\/.*/
 
