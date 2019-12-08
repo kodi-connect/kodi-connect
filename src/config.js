@@ -41,9 +41,11 @@ const config = Object.freeze({
 
   clientId: process.env.CLIENT_ID || 'dummy_client_id',
   clientSecret: process.env.CLIENT_SECRET || 'dummy_client_secret',
+  allowOauthPassword: process.env.ALLOW_OAUTH_PASSWORD || process.env.NODE_ENV === 'development',
 
   hostUrl: getHostUrl(),
 
+  dummyEmail: process.env.DUMMY_EMAIL || process.env.NODE_ENV === 'development',
   emailAddress: process.env.EMAIL_ADDRESS,
   emailPassword: process.env.EMAIL_PASSWORD,
 

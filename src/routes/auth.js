@@ -10,7 +10,7 @@ import { validateEmail } from '../util/email';
 
 const OAUTH_FIELDS = ['state', 'response_type', 'redirect', 'client_id', 'client_secret', 'redirect_uri'];
 
-const logger = createLogger('routes/devices');
+const logger = createLogger('routes/auth');
 
 const router = new Router({ mergeParams: true });
 
