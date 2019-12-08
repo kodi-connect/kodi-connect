@@ -74,7 +74,7 @@ export default async function remoteVideoPlayerHandler({ event, username }: Alex
   }
 
   const endpoint = {
-    ..._.get(event, 'directive.endpoint'),
+    endpointId,
   };
 
   const header = {
