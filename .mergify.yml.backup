@@ -11,5 +11,5 @@ pull_request_rules:
       merge:
         method: merge
         strict: true
-        strict_method: squash
+        strict_method: rebase
       delete_head_branch:
