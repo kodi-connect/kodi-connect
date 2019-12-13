@@ -119,7 +119,12 @@ jobs:
       - run:
           name: Print logs
           when: always
-          command: docker-compose logs
+          command: |
+            mkdir -p /tmp/logs
+            docker-compose logs | tee /tmp/logs/docker_stack.log
+      
+      - store_artifacts:
+          path: /tmp/logs
   
   api_test:
     machine:
@@ -165,7 +170,12 @@ jobs:
       - run:
           name: Print logs
           when: always
-          command: docker-compose logs
+          command: |
+            mkdir -p /tmp/logs
+            docker-compose logs | tee /tmp/logs/docker_stack.log
+      
+      - store_artifacts:
+          path: /tmp/logs
 
   publish:
     docker:
