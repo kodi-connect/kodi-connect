@@ -74,6 +74,8 @@ jobs:
   integration_test:
     machine:
       image: circleci/classic:latest
+    
+    working_directory: tests/integration
 
     steps:
       - checkout
@@ -100,8 +102,6 @@ jobs:
             export ADDON_VERSION=0.2.0
             export ALEXA_VERSION=1.0
 
-            cd tests/integration
-
             docker-compose build
             docker-compose pull mongo mongo-seed kodi
 
@@ -111,8 +111,6 @@ jobs:
             export IMAGE_NAME="$(cat /tmp/workspace/image_name)"
             export ADDON_VERSION=0.2.0
             export ALEXA_VERSION=1.0
-
-            cd tests/integration
 
             docker-compose run --service-ports --rm alexa
       
@@ -129,6 +127,8 @@ jobs:
   api_test:
     machine:
       image: circleci/classic:latest
+    
+    working_directory: tests/api
 
     steps:
       - checkout
@@ -153,8 +153,6 @@ jobs:
           command: |
             export IMAGE_NAME="$(cat /tmp/workspace/image_name)"
 
-            cd tests/api
-
             docker-compose build
             docker-compose pull mongo
 
@@ -162,8 +160,6 @@ jobs:
           name: Run API tests
           command: |
             export IMAGE_NAME="$(cat /tmp/workspace/image_name)"
-
-            cd tests/api
 
             docker-compose run --service-ports --rm tests
       
@@ -209,14 +205,14 @@ workflows:
   build:
     jobs:
       - test
-      - image:
-          requires:
-            - test
+      - image
       - integration_test:
           requires:
+            - test
             - image
       - api_test:
           requires:
+            - test
             - image
       - publish:
           requires:
