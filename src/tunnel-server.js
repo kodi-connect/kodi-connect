@@ -29,7 +29,8 @@ export default function createTunnelServer(server: Object, path: string): KodiIn
     });
 
     const { username, secret } = parseAuthorizationHeader(req);
-    logger.info('Kodi device connecting:', { username, secret });
+    const { addonversion } = req.headers || {};
+    logger.info('Kodi device connecting:', { username, secret, addonversion });
     if (!username || !secret) {
       logger.warn('Invalid Authorization header', { username, secret });
       ws.close();
