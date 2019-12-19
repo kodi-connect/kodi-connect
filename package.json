@@ -37,7 +37,7 @@
     "yup": "^0.28.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.5",
+    "@babel/cli": "^7.7.7",
     "@babel/core": "^7.7.5",
     "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
     "@babel/plugin-transform-flow-strip-types": "^7.7.4",
