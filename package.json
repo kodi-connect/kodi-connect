@@ -41,7 +41,7 @@
     "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.7.7",
     "@babel/plugin-transform-flow-strip-types": "^7.7.4",
-    "@babel/preset-env": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
     "@babel/register": "^7.7.4",
     "babel-eslint": "^10.0.1",
     "eslint": "^6.7.2",
