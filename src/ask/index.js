@@ -1,43 +1,21 @@
 // @flow
 
-import { ACCOUNT_LINKING, createSkillManifest } from './constants';
+import { VENDOR_ID, ACCOUNT_LINKING, createSkillManifest } from './constants';
 import createLogger from '../logging';
 import { askRequest } from './api';
 import { sleep } from '../util/time';
 
 const logger = createLogger('ask');
 
-export async function getVendors(lwaCredentials: Object) {
-  logger.info('getVendors');
-  try {
-    const response = await askRequest(lwaCredentials, {
-      method: 'GET',
-      path: '/v1/vendors',
-    });
-
-    return response.data.vendors;
-  } catch (error) {
-    logger.error('Get Vendors failed', { error });
-    throw Error('Get Vendors failed');
-  }
-}
-
-export async function getVendorId(lwaCredentials: Object): Promise<string> {
-  const vendors = await getVendors(lwaCredentials);
-  const vendor = vendors.find((v) => v.roles.includes('ROLE_ADMINISTRATOR'));
-  if (!vendor) throw new Error('Vendor ID not found');
-  return vendor.id;
-}
 
 export async function getSkills(lwaCredentials: Object) {
   logger.info('getSkills');
   try {
-    const vendorId = await getVendorId(lwaCredentials);
     const response = await askRequest(lwaCredentials, {
       method: 'GET',
       path: '/v1/skills',
       params: {
-        vendorId,
+        vendorId: VENDOR_ID,
       },
     });
 
@@ -138,13 +116,12 @@ async function waitForSkillCreation(lwaCredentials: Object, skillId: string, sec
 async function createSkill(lwaCredentials: Object, lambdaArn: string) {
   logger.info('createSkill');
   try {
-    const vendorId = await getVendorId(lwaCredentials);
     const response = await askRequest(lwaCredentials, {
       method: 'POST',
       path: '/v1/skills',
       data: {
         manifest: createSkillManifest(lambdaArn),
-        vendorId,
+        vendorId: VENDOR_ID,
       },
     });
 
