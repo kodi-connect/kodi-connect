@@ -3,7 +3,7 @@
 import config from '../config';
 import type { AwsAlexaGatewayRegion, AwsRegion } from '../types';
 
-const VENDOR_ID = 'M26THQ9LJL7SS3';
+export const VENDOR_ID = 'M26THQ9LJL7SS3';
 
 const LOCALES: string[] = [
   'en-US',
