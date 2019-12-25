@@ -1,7 +1,7 @@
 ARG GIT_HASH
 
 ########################################
-FROM node:12.12.0 as builder
+FROM node:12.14 as builder
 
 ENV HOME=/home/node
 WORKDIR $HOME/app
@@ -17,7 +17,7 @@ COPY . $HOME/app
 RUN yarn run build
 
 ########################################
-FROM node:12.12.0 as prod
+FROM node:12.14-slim as prod
 
 LABEL githash=${GIT_HASH}
 
