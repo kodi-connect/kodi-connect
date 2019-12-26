@@ -49,7 +49,7 @@ export async function refreshAccessToken(username: string, region: AwsRegion, re
         refresh_token: refreshToken,
       },
     );
-  } catch(error) {
+  } catch (error) {
     logger.error('Failed to refresh access token', { error, responseData: error.response && error.response.data });
     throw new Error('Failed to refresh access token');
   }
