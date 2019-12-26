@@ -21,7 +21,7 @@ export async function getSkills(lwaCredentials: Object) {
 
     return response.data.skills;
   } catch (error) {
-    logger.error('Get Skills failed', { error });
+    logger.error('Get Skills failed', { error, responseData: error.response && error.response.data });
     throw Error('Get Skills failed');
   }
 }
@@ -36,7 +36,7 @@ export async function getSkillManifest(lwaCredentials: Object, skillId: string):
 
     return response.data.manifest;
   } catch (error) {
-    logger.error('Get Skill Manifest failed', { error });
+    logger.error('Get Skill Manifest failed', { error, responseData: error.response && error.response.data });
     throw Error('Get Skill Manifest failed');
   }
 }
@@ -68,7 +68,7 @@ async function getSkillStatus(lwaCredentials: Object, skillId: string) {
 
     return response.data.manifest.lastUpdateRequest;
   } catch (error) {
-    logger.error('Get Skill Status failed', { error });
+    logger.error('Get Skill Status failed', { error, responseData: error.response && error.response.data });
     throw Error('Get Skill Status failed');
   }
 }
@@ -86,7 +86,7 @@ export async function getSkillCredentials(lwaCredentials: Object, skillId: strin
 
     return response.data;
   } catch (error) {
-    logger.error('Get Skill Credentials failed', { error });
+    logger.error('Get Skill Credentials failed', { error, responseData: error.response && error.response.data });
     throw Error('Get Skill Credentials failed');
   }
 }
@@ -127,7 +127,7 @@ async function createSkill(lwaCredentials: Object, lambdaArn: string) {
 
     return response.data.skillId;
   } catch (error) {
-    logger.error('Create Skill failed', { error });
+    logger.error('Create Skill failed', { error, responseData: error.response && error.response.data });
     throw Error('Create Skill failed');
   }
 }
@@ -143,7 +143,7 @@ async function updateAccountLinking(lwaCredentials: Object, skillId: string) {
       },
     });
   } catch (error) {
-    logger.error('Update Skill account linking failed', { error });
+    logger.error('Update Skill account linking failed', { error, responseData: error.response && error.response.data });
     throw Error('Update Skill account linking failed');
   }
 }
@@ -172,7 +172,7 @@ export async function addSkill(lwaCredentials: Object, lambdaArn: string): Promi
     try {
       if (skillId) await deleteSkill(lwaCredentials, skillId);
     } catch (deleteError) {
-      logger.error('Failed to cleanup hanging skill', { error: deleteError, skillId });
+      logger.error('Failed to cleanup hanging skill', { error: deleteError, skillId, responseData: error.response && error.response.data });
     }
     throw error;
   }

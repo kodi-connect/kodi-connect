@@ -95,7 +95,7 @@ export async function askRequest(lwaCredentials: Object, options: Object): $Call
         },
       });
     } catch (error) {
-      logger.error(
+      logger.warn(
         'Ask request failed',
         {
           error,

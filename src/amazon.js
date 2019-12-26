@@ -40,14 +40,19 @@ export async function getUserAuthTokens(username: string, region: AwsRegion, cod
 
 export async function refreshAccessToken(username: string, region: AwsRegion, refreshToken: string): Promise<AmazonTokens> {
   const alexaSkillMessagingCredentials = await getAlexaSkillMessagingCredentials(username);
-  return accessTokenRequest(
-    alexaSkillMessagingCredentials,
-    region,
-    {
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    },
-  );
+  try {
+    return accessTokenRequest(
+      alexaSkillMessagingCredentials,
+      region,
+      {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      },
+    );
+  } catch(error) {
+    logger.error('Failed to refresh access token', { error, responseData: error.response && error.response.data });
+    throw new Error('Failed to refresh access token');
+  }
 }
 
 export async function getRegionAndAccessToken(username: string): Promise<?{ region: AwsRegion, accessToken: string }> {
