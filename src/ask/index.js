@@ -8,14 +8,44 @@ import { sleep } from '../util/time';
 const logger = createLogger('ask');
 
 
+export async function getVendors(lwaCredentials: Object) {
+  logger.info('getVendors');
+  try {
+    const response = await askRequest(lwaCredentials, {
+      method: 'GET',
+      path: '/v1/vendors',
+    });
+
+    return response.data.vendors;
+  } catch (error) {
+    logger.error('Get Vendors failed', { error });
+    throw Error('Get Vendors failed');
+  }
+}
+
+export async function getVendorId(lwaCredentials: Object): Promise<string> {
+  const vendors = await getVendors(lwaCredentials);
+  console.log('VENDORS:', vendors);
+  const vendor = vendors.find((v) => v.roles.includes('ROLE_ADMINISTRATOR'));
+  if (!vendor) {
+    logger.error('Vendor ID not found', { vendors })
+    throw new Error('Vendor ID not found');
+  }
+  return vendor.id;
+}
+
+
 export async function getSkills(lwaCredentials: Object) {
   logger.info('getSkills');
+
+  const vendorId = await getVendorId(lwaCredentials);
+
   try {
     const response = await askRequest(lwaCredentials, {
       method: 'GET',
       path: '/v1/skills',
       params: {
-        vendorId: VENDOR_ID,
+        vendorId,
       },
     });
 
