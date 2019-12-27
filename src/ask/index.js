@@ -25,10 +25,9 @@ export async function getVendors(lwaCredentials: Object) {
 
 export async function getVendorId(lwaCredentials: Object): Promise<string> {
   const vendors = await getVendors(lwaCredentials);
-  console.log('VENDORS:', vendors);
   const vendor = vendors.find((v) => v.roles.includes('ROLE_ADMINISTRATOR'));
   if (!vendor) {
-    logger.error('Vendor ID not found', { vendors })
+    logger.error('Vendor ID not found', { vendors });
     throw new Error('Vendor ID not found');
   }
   return vendor.id;
