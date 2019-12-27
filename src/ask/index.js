@@ -144,13 +144,14 @@ async function waitForSkillCreation(lwaCredentials: Object, skillId: string, sec
 
 async function createSkill(lwaCredentials: Object, lambdaArn: string) {
   logger.info('createSkill');
+  const vendorId = await getVendorId(lwaCredentials);
   try {
     const response = await askRequest(lwaCredentials, {
       method: 'POST',
       path: '/v1/skills',
       data: {
         manifest: createSkillManifest(lambdaArn),
-        vendorId: VENDOR_ID,
+        vendorId,
       },
     });
 
