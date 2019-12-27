@@ -120,7 +120,7 @@ export async function getSkillCredentials(lwaCredentials: Object, skillId: strin
   }
 }
 
-async function waitForSkillCreation(lwaCredentials: Object, skillId: string, seconds: number = 5) {
+async function waitForSkillCreation(lwaCredentials: Object, skillId: string, seconds: number = 30) {
   logger.info('waitForSkillCreation', { skillId, seconds });
   for (let i = 0; i < seconds; i += 1) {
     await sleep(1000);
