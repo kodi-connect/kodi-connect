@@ -1,6 +1,6 @@
 // @flow
 
-import { VENDOR_ID, ACCOUNT_LINKING, createSkillManifest } from './constants';
+import { ACCOUNT_LINKING, createSkillManifest } from './constants';
 import createLogger from '../logging';
 import { askRequest } from './api';
 import { sleep } from '../util/time';
