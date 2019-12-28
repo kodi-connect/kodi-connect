@@ -43,7 +43,12 @@ export default async function authorizationHandler({ event, meta, username }: Al
       try {
         await authorizeUser(username, grantCode, region);
       } catch (error) {
-        logger.error('Failed to authorize user', { error, username, regionValue, region });
+        logger.error(
+          'Failed to authorize user',
+          {
+            error, username, regionValue, region,
+          },
+        );
         throw error;
       }
 
