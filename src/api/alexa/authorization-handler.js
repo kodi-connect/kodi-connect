@@ -33,13 +33,18 @@ export default async function authorizationHandler({ event, meta, username }: Al
     case 'AcceptGrant': {
       const grantCode = _.get(event, 'directive.payload.grant.code');
       const regionValue = _.get(meta, 'region', 'us-east-1').split('-')[0];
-      let region: AwsRegion;
+
+      const region: AwsRegion = validateAwsRegion(meta.region);
+      if (region == null) {
+        logger.error('Invalid aws region', { username, regionValue });
+        throw new Error('Invalid aws region');
+      }
 
       try {
-        region = validateAwsRegion(meta.region);
         await authorizeUser(username, grantCode, region);
       } catch (error) {
-        logger.error('Invalid aws region', { error, username, regionValue });
+        logger.error('Failed to authorize user', { error, username, regionValue, region });
+        throw error;
       }
 
       break;
