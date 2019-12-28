@@ -3,8 +3,6 @@
 import config from '../config';
 import type { AwsAlexaGatewayRegion, AwsRegion } from '../types';
 
-export const VENDOR_ID = 'M26THQ9LJL7SS3';
-
 const LOCALES: string[] = [
   'en-US',
   'en-GB',
@@ -109,8 +107,8 @@ export function createSkillManifest(lambdaArn: string) {
       locales: LOCALES.reduce((acc, locale) => ({
         ...acc,
         [locale]: {
-          termsOfUseUrl: 'https://kodiconnect.kislan.sk/terms-of-use/alexa',
-          privacyPolicyUrl: 'https://kodiconnect.kislan.sk/privacy-policy/alexa',
+          termsOfUseUrl: `${config.hostUrl}/terms-of-use/alexa`,
+          privacyPolicyUrl: `${config.hostUrl}/privacy-policy/alexa`,
         },
       }), {}),
       isExportCompliant: true,
@@ -124,8 +122,8 @@ export function createSkillManifest(lambdaArn: string) {
 export const ACCOUNT_LINKING = {
   skipOnEnablement: false,
   accessTokenScheme: 'HTTP_BASIC',
-  accessTokenUrl: 'https://kodiconnect.kislan.sk/oauth/token',
-  authorizationUrl: 'https://kodiconnect.kislan.sk/oauth/authorize',
+  accessTokenUrl: `${config.hostUrl}/oauth/token`,
+  authorizationUrl: `${config.hostUrl}/oauth/authorize`,
   clientId: config.clientId,
   clientSecret: config.clientSecret,
   defaultTokenExpirationInSeconds: 3600,

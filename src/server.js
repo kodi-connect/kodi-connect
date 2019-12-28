@@ -6,7 +6,7 @@ import bugsnag from 'bugsnag';
 import express from 'express';
 import http from 'http';
 import _ from 'lodash';
-import OAuthServer from 'express-oauth-server';
+import OAuthServer from './external/express-oauth-server';
 import bodyParser from 'body-parser';
 import config from './config';
 import createTunnelServer from './tunnel-server';

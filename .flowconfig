@@ -1,5 +1,6 @@
 [ignore]
 <PROJECT_ROOT>/node_modules/bcryptjs/src/bower.json
+<PROJECT_ROOT>/src/external
 
 [include]
 
