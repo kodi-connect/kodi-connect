@@ -63,6 +63,7 @@ export async function getAccessToken(bearerToken: string) {
  */
 
 const customRedirectUris = (process.env.CUSTOM_REDIRECT_URI && [process.env.CUSTOM_REDIRECT_URI]) || [];
+const customRedirectUrisRegex = customRedirectUris.map((uri) => RegExp(uri));
 
 export async function getClient(clientId: string, clientSecret: string) {
   // return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
@@ -71,12 +72,6 @@ export async function getClient(clientId: string, clientSecret: string) {
   let client = {
     id: 'abcdefghijklmnopqrstuvwxyz',
     grants: ['authorization_code', 'refresh_token'],
-    redirectUris: [
-      'https://layla.amazon.com/api/skill/link/M26THQ9LJL7SS3',
-      'https://pitangui.amazon.com/api/skill/link/M26THQ9LJL7SS3',
-      'https://alexa.amazon.co.jp/api/skill/link/M26THQ9LJL7SS3',
-      ...customRedirectUris,
-    ],
   };
 
   if (config.allowOauthPassword) {
@@ -87,6 +82,17 @@ export async function getClient(clientId: string, clientSecret: string) {
   }
 
   return client;
+}
+
+export async function validateRedirectUri(redirectUri: string) {
+  const REDIRECT_URI_REGEX = [
+    /https:\/\/layla\.amazon\.com\/api\/skill\/link\/.*/,
+    /https:\/\/pitangui\.amazon\.com\/api\/skill\/link\/.*/,
+    /https:\/\/alexa\.amazon\.co\.jp\/api\/skill\/link\/.*/,
+    ...customRedirectUrisRegex,
+  ];
+
+  return REDIRECT_URI_REGEX.some((regex) => regex.test(redirectUri));
 }
 
 /**
