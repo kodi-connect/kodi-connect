@@ -6,6 +6,7 @@ import createLogger from '../logging';
 import { isAdminMiddleware, isLoggedIn, isLoggedInMiddleware } from './util';
 import { wrapAsync } from '../util/api';
 import { confirmUserRegistration, getDevices } from '../users';
+import type { KodiInstances } from '../tunnel-server';
 
 const logger = createLogger('routes/templates');
 
