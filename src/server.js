@@ -12,7 +12,7 @@ import config from './config';
 import createTunnelServer from './tunnel-server';
 import * as OAuthModel from './oauth-model';
 import oauthRouter from './routes/oauth';
-import templatesRouter from './routes/templates';
+import createTemplatesRouter from './routes/templates';
 import authRouter from './routes/auth';
 import devicesRouter from './routes/devices';
 import { isLoggedInMiddleware } from './routes/util';
@@ -76,7 +76,7 @@ export default function createServer() {
   app.use(bodyParser.urlencoded({ extended: false }));
 
   app.use('/oauth', oauthRouter(app.oauth));
-  app.use(templatesRouter);
+  app.use(createTemplatesRouter(kodiInstances));
   app.use(authRouter);
   app.use('/device', devicesRouter);
   app.use('/alexa-skill', isLoggedInMiddleware(true), alexaSkillRouter);

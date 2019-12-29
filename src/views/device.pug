@@ -4,3 +4,4 @@ tr.device-row
   td
     form(method='POST' action='/device/remove/' + device.id)
       button.pt-button.pt-minimal.pt-icon-trash(type='submit' name='remove')
+  td= device.connected ? 'Yes' : 'No'
