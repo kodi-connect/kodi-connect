@@ -24,16 +24,12 @@ jobs:
             - node_modules
 
       - run:
-          name: Install flow typed
-          command: yarn flowtyped
+          name: Run typescript
+          command: yarn build
 
       - run:
           name: Run eslint
           command: yarn test:lint
-
-      - run:
-          name: Run flow
-          command: yarn test:flow
 
       - run:
           name: Run tests

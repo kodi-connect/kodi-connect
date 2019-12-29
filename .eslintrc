@@ -1,24 +1,38 @@
 {
-  "extends": [
-    "eslint-config-airbnb-base",
-    "plugin:flowtype/recommended"
+  "parser":  "@typescript-eslint/parser",
+  "parserOptions":  {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "extends":  [
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
   ],
   "env": {
     "browser": true,
     "node": true,
     "jest": true
   },
+  // "settings": {
+  //   "import/parsers": {
+  //     "@typescript-eslint/parser": [".ts", ".tsx"]
+  //   },
+  //   "import/resolver": {
+  //     "typescript": {}
+  //   }
+  // },
   "rules": {
-    "max-len": [2, 160],
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true, "optionalDependencies": false, "peerDependencies": false }],
-    "import/prefer-default-export": 0,
-    "no-restricted-syntax": 0,
-    "no-await-in-loop": 0,
-    "no-continue": 0,
-    "no-return-await": 0,
-    "camelcase": 0
-  },
-  "plugins": [
-    "flowtype"
-  ]
+    "@typescript-eslint/camelcase": 0,
+    "@typescript-eslint/ban-types": 1,
+    "@typescript-eslint/no-empty-function": 1
+    // "max-len": [2, 160],
+    // "import/no-extraneous-dependencies": ["error", { "devDependencies": true, "optionalDependencies": false, "peerDependencies": false }],
+    // "import/prefer-default-export": 0,
+    // "no-restricted-syntax": 0,
+    // "no-await-in-loop": 0,
+    // "no-continue": 0,
+    // "no-return-await": 0,
+    // "camelcase": 0
+  }
 }
