@@ -18,7 +18,7 @@
     "ajv": "^6.10.0",
     "aws-sdk": "^2.596.0",
     "axios": "^0.19.0",
-    "basic-auth": "1.1.0",
+    "basic-auth": "2.0.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "3.7.2",
     "body-parser": "^1.18.2",
