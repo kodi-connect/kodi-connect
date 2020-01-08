@@ -1,4 +1,5 @@
 const axios = require('axios');
+const adapter = require('axios/lib/adapters/http');
 
 const { KODI_CONNECT_URL, mongoDb, getLoggedInUserSession } = require('./util');
 
@@ -7,6 +8,7 @@ describe('Devices', () => {
     const session = await getLoggedInUserSession();
 
     let resp = await session({
+      adapter,
       method: 'GET',
       url: `${KODI_CONNECT_URL}/devices`,
       validateStatus: (status) => status == 200,
@@ -15,6 +17,7 @@ describe('Devices', () => {
     expect(resp.data).not.toContain('Living Room Kodi');
 
     await session({
+      adapter,
       method: 'POST',
       url: `${KODI_CONNECT_URL}/device/add`,
       data: new URLSearchParams({
@@ -24,6 +27,7 @@ describe('Devices', () => {
     });
 
     resp = await session({
+      adapter,
       method: 'GET',
       url: `${KODI_CONNECT_URL}/devices`,
       validateStatus: (status) => status == 200,
