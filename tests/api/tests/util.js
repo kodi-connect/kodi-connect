@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const axios = require('axios');
+const adapter = require('axios/lib/adapters/http');
 const bcrypt = require('bcryptjs');
 
 const KODI_CONNECT_URL = process.env.KODI_CONNECT_URL || null;
@@ -37,6 +38,7 @@ async function getLoggedInUserSession(credentials) {
   if (!username || !password) throw new Error('Missing username/password');
 
   const resp = await axios({
+    adapter,
     method: 'POST',
     url: `${KODI_CONNECT_URL}/login`,
     data: new URLSearchParams({

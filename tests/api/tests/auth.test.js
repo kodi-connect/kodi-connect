@@ -1,10 +1,12 @@
 const axios = require('axios');
+const adapter = require('axios/lib/adapters/http');
 
 const { KODI_CONNECT_URL, mongoDb, getRandomAlphanum, createUser, getLoggedInUserSession } = require('./util');
 
 describe('Auth', () => {
   test('Password oauth should not be enabled', async () => {
     const p = axios({
+      adapter,
       method: 'POST',
       url: `${KODI_CONNECT_URL}/oauth/token`,
       auth: {
@@ -29,6 +31,7 @@ describe('Auth', () => {
     console.log(`Email: ${email}`);
 
     await axios({
+      adapter,
       method: 'POST',
       url: `${KODI_CONNECT_URL}/register`,
       data: new URLSearchParams({
@@ -41,6 +44,7 @@ describe('Auth', () => {
     const { confirmationToken } = await (await mongoDb).db('kodi').collection('Users').findOne({ username: email });
 
     await axios({
+      adapter,
       method: 'GET',
       url: `${KODI_CONNECT_URL}/confirm/${confirmationToken}`,
     });
@@ -48,6 +52,7 @@ describe('Auth', () => {
     const session = await getLoggedInUserSession({ username: email, password });
 
     await session({
+      adapter,
       method: 'GET',
       url: `${KODI_CONNECT_URL}/devices`,
       validateStatus: (status) => status == 200,
@@ -62,6 +67,7 @@ describe('Auth', () => {
     console.log(`Email: ${email}`);
 
     const p = axios({
+      adapter,
       method: 'POST',
       url: `${KODI_CONNECT_URL}/register`,
       data: new URLSearchParams({
@@ -80,6 +86,7 @@ describe('Auth', () => {
     console.log(`Email: ${username}`);
 
     const p = axios({
+      adapter,
       method: 'POST',
       url: `${KODI_CONNECT_URL}/register`,
       data: new URLSearchParams({
