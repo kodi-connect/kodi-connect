@@ -62,7 +62,7 @@ export default function createTunnelServer(
         })
       },
       error => {
-        logger.error('Failed to get device', { username, error })
+        logger.error('Failed to get device', { username, originalError: error })
         ws.close()
       }
     )
@@ -124,7 +124,7 @@ export async function kodiRpc(
       logger.warn('RPC Timeout', { deviceId, rpc })
       throw new Error('Timeout')
     } else {
-      logger.error('RPC call failed', { error })
+      logger.error('RPC call failed', { originalError: error })
       throw new Error('RPC failed')
     }
   }
@@ -172,7 +172,7 @@ export function asyncKodiRpcCommand(
 ) {
   kodiRpcCommand(kodiInstances, username, deviceId, commandType, additionalData).catch(error =>
     logger.error('Kodi RPC Command failed', {
-      error,
+      originalError: error,
       username,
       deviceId,
       commandType,

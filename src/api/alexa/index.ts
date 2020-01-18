@@ -140,7 +140,7 @@ export async function handler(
       ? { context: responseContext, event: responseEvent }
       : { event: responseEvent }
   } catch (error) {
-    logger.error('Alexa handler failed', { error, request })
+    logger.error('Alexa handler failed', { originalError: error, request })
     response = {
       event: getErrorResposne(error, _.get(request.event, 'directive.header.correlationToken')),
     }

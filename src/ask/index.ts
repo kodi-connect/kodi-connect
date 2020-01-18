@@ -2,6 +2,7 @@ import { ACCOUNT_LINKING, createSkillManifest } from './constants'
 import createLogger from '../logging'
 import { askRequest } from './api'
 import { sleep } from '../util/time'
+import { BugsnagError } from '../errors'
 
 const logger = createLogger('ask')
 
@@ -15,7 +16,7 @@ export async function getVendors(lwaCredentials: Record<string, any>) {
 
     return response.data.vendors
   } catch (error) {
-    logger.error('Get Vendors failed', { error })
+    logger.error('Get Vendors failed', { originalError: error })
     throw Error('Get Vendors failed')
   }
 }
@@ -47,7 +48,7 @@ export async function getSkills(lwaCredentials: Record<string, any>) {
     return response.data.skills
   } catch (error) {
     logger.error('Get Skills failed', {
-      error,
+      originalError: error,
       responseData: error.response && error.response.data,
     })
     throw Error('Get Skills failed')
@@ -68,7 +69,7 @@ export async function getSkillManifest(
     return response.data.manifest
   } catch (error) {
     logger.error('Get Skill Manifest failed', {
-      error,
+      originalError: error,
       responseData: error.response && error.response.data,
     })
     throw Error('Get Skill Manifest failed')
@@ -105,7 +106,7 @@ async function getSkillStatus(lwaCredentials: Record<string, any>, skillId: stri
     return response.data.manifest.lastUpdateRequest
   } catch (error) {
     logger.error('Get Skill Status failed', {
-      error,
+      originalError: error,
       responseData: error.response && error.response.data,
     })
     throw Error('Get Skill Status failed')
@@ -126,7 +127,7 @@ export async function getSkillCredentials(lwaCredentials: Record<string, any>, s
     return response.data
   } catch (error) {
     logger.error('Get Skill Credentials failed', {
-      error,
+      originalError: error,
       responseData: error.response && error.response.data,
     })
     throw Error('Get Skill Credentials failed')
@@ -140,7 +141,7 @@ async function waitForSkillCreation(
 ) {
   logger.info('waitForSkillCreation', { skillId, seconds })
   for (let i = 0; i < seconds; i += 1) {
-    await sleep(1000)
+    await sleep(5000)
     const { status, errors } = await getSkillStatus(lwaCredentials, skillId)
     switch (status) {
       case 'IN_PROGRESS':
@@ -175,7 +176,7 @@ async function createSkill(lwaCredentials: Record<string, any>, lambdaArn: strin
     return response.data.skillId
   } catch (error) {
     logger.error('Create Skill failed', {
-      error,
+      originalError: error,
       responseData: error.response && error.response.data,
     })
     throw Error('Create Skill failed')
@@ -194,7 +195,7 @@ async function updateAccountLinking(lwaCredentials: Record<string, any>, skillId
     })
   } catch (error) {
     logger.error('Update Skill account linking failed', {
-      error,
+      originalError: error,
       responseData: error.response && error.response.data,
     })
     throw Error('Update Skill account linking failed')
@@ -209,7 +210,7 @@ export async function deleteSkill(lwaCredentials: Record<string, any>, skillId: 
       path: `/v1/skills/${skillId}`,
     })
   } catch (error) {
-    logger.error('Delete Skill failed', { error })
+    logger.error('Delete Skill failed', { originalError: error })
     throw Error('Delete Skill failed')
   }
 }
@@ -229,7 +230,7 @@ export async function addSkill(
       if (skillId) await deleteSkill(lwaCredentials, skillId)
     } catch (deleteError) {
       logger.error('Failed to cleanup hanging skill', {
-        error: deleteError,
+        originalError: deleteError,
         skillId,
         responseData: error.response && error.response.data,
       })

@@ -68,7 +68,7 @@ export default async function asyncMessageHandler(
     await handler(username, deviceId, restData)
   } catch (error) {
     logger.error('Async message handler failed', {
-      error,
+      originalError: error,
       username,
       deviceId,
       data,

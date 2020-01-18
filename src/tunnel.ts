@@ -45,7 +45,7 @@ export default function createTunnel(username: string, deviceId: string, ws: any
 
     if (msg.async === true) {
       asyncMessageHandler(username, deviceId, msg.data).catch(error => {
-        logger.error('Async message handler failed', { error })
+        logger.error('Async message handler failed', { originalError: error })
         ws.close()
       })
       return

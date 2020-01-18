@@ -38,7 +38,7 @@ async function getDevices(
         const { capabilities } = await kodiInstances[device.id].rpc({ type: 'capabilities' })
         return { ...device, capabilities: capabilities || LEGACY_CAPABILITIES }
       } catch (error) {
-        logger.error('Failed to get capabilities', { error, device })
+        logger.error('Failed to get capabilities', { originalError: error, device })
         return { ...device, capabilities: LEGACY_CAPABILITIES }
       }
     })
