@@ -68,7 +68,10 @@ router.post(
         skillMessagingCredentials
       )
     } catch (error) {
-      logger.error('Failed to store alexa skill messaging credentials', { error, skillId })
+      logger.error('Failed to store alexa skill messaging credentials', {
+        originalError: error,
+        skillId,
+      })
       await deleteSkill(req.session.lwaCredentials, skillId)
     }
 
@@ -121,7 +124,7 @@ router.get(
       req.session.lwaCredentials = transformAccessTokenData(accessTokenData)
     } catch (error) {
       logger.error('Failed to get Amazon tokens', {
-        error,
+        originalError: error,
         responseData: error.response && error.response.data,
       })
     }

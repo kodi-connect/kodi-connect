@@ -34,7 +34,7 @@ export function wrapAsync(handler: Function) {
         clearTimeout(timerId)
       },
       error => {
-        logger.error('Request failed', { error })
+        logger.error('Request failed', { originalError: error })
         if (timedOut) return
         clearTimeout(timerId)
         res.status(500).json({ error: error.message })
@@ -61,7 +61,7 @@ export function wrapAsyncMiddleware(handler: Function) {
         clearTimeout(timerId)
       },
       error => {
-        logger.error('Request middleware failed', { error })
+        logger.error('Request middleware failed', { originalError: error })
         if (timedOut) return
         clearTimeout(timerId)
         res.status(500).json({ error: error.message })

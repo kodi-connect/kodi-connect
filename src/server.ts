@@ -28,7 +28,7 @@ export default function createServer() {
 
   mongoose.connect(config.mongoConnectString, error => {
     if (error) {
-      logger.error('ERROR connecting to MongoDB', { error })
+      logger.error('ERROR connecting to MongoDB', { originalError: error })
     } else {
       logger.info('Successfully connected to MongoDB')
     }

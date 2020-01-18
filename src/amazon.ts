@@ -60,7 +60,7 @@ export async function refreshAccessToken(
     })
   } catch (error) {
     logger.error('Failed to refresh access token', {
-      error,
+      originalError: error,
       responseData: error.response && error.response.data,
     })
     throw new Error('Failed to refresh access token')

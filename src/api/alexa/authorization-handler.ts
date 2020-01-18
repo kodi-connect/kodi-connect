@@ -17,7 +17,7 @@ async function authorizeUser(username: string, code: string, region: AwsRegion) 
   try {
     tokens = await amazon.getUserAuthTokens(username, region, code)
   } catch (error) {
-    logger.error('Failed to get amazon tokens', { error, username, region })
+    logger.error('Failed to get amazon tokens', { originalError: error, username, region })
     return
   }
 
@@ -42,7 +42,7 @@ export default async function authorizationHandler({ event, meta, username }: Al
         await authorizeUser(username, grantCode, region)
       } catch (error) {
         logger.error('Failed to authorize user', {
-          error,
+          originalError: error,
           username,
           regionValue,
           region,
