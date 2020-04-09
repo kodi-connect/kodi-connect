@@ -17,15 +17,15 @@ export type VideoFilter = {
 }
 
 function getEntityByType(entities: Record<string, any>[], type: string): string | null | undefined {
-  const entity = entities.find(e => e.type === type)
+  const entity = entities.find((e) => e.type === type)
   if (!entity) return null
   return entity.value && entity.value.toLowerCase()
 }
 
 function getEntitiesByType(entities: Record<string, any>[], type: string): string[] {
   return entities
-    .filter(e => e.type === type)
-    .map(e => e.value)
+    .filter((e) => e.type === type)
+    .map((e) => e.value)
     .filter((v, i, arr) => arr.indexOf(v) === i)
 }
 

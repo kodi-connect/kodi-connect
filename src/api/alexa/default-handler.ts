@@ -20,7 +20,7 @@ async function getState(
 ): Promise<KodiState[]> {
   const response = await kodiRpcCommand(kodiInstances, username, endpointId, 'state')
   const time = new Date().toISOString()
-  return response.state.map(state => ({ ...state, time }))
+  return response.state.map((state) => ({ ...state, time }))
 }
 
 async function stateReportHandler({ event, username }: AlexaRequest, kodiInstances: KodiInstances) {

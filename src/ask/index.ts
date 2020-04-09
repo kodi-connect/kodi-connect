@@ -23,7 +23,7 @@ export async function getVendors(lwaCredentials: Record<string, any>) {
 
 export async function getVendorId(lwaCredentials: Record<string, any>): Promise<string> {
   const vendors = await getVendors(lwaCredentials)
-  const vendor = vendors.find(v => v.roles.includes('ROLE_ADMINISTRATOR'))
+  const vendor = vendors.find((v) => v.roles.includes('ROLE_ADMINISTRATOR'))
   if (!vendor) {
     logger.error('Vendor ID not found', { vendors })
     throw new Error('Vendor ID not found')
@@ -80,7 +80,7 @@ export async function getSkill(
   lwaCredentials: Record<string, any>
 ): Promise<Record<string, any> | null | undefined> {
   const skills = await getSkills(lwaCredentials)
-  const skill = skills.find(s => s.apis.includes('video') && s.nameByLocale['en-US'] === 'Kodi')
+  const skill = skills.find((s) => s.apis.includes('video') && s.nameByLocale['en-US'] === 'Kodi')
   if (!skill) return null
 
   const { skillId } = skill

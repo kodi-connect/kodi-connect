@@ -53,7 +53,7 @@ export default function createOAuthRouter(oauth: Record<string, any>) {
     '/authorize',
     oauth.authorize({
       authenticateHandler: {
-        handle: req => (req.session.user ? { username: req.session.user.username } : null),
+        handle: (req) => (req.session.user ? { username: req.session.user.username } : null),
       },
     })
   )
