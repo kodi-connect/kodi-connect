@@ -59,7 +59,7 @@ export default function createTemplatesRouter(kodiInstances: KodiInstances) {
     isLoggedInMiddleware(true),
     wrapAsync(async (req, res) => {
       const devices = await getDevices(req.session.user.username)
-      const devicesWithStatus = devices.map(device => ({
+      const devicesWithStatus = devices.map((device) => ({
         ...device,
         connected: kodiInstances[device.id] != null,
       }))

@@ -18,9 +18,9 @@ describe('Seach and Display Results', () => {
       'Megan Hanks',
     ])
     expect(filter.genres).toEqual(['Comedy', 'Comedy drama', 'Musical comedy', 'Romantic comedy'])
-    ;['collections', 'roles'].forEach(key => expect(filter[key]).toEqual([]))
+    ;['collections', 'roles'].forEach((key) => expect(filter[key]).toEqual([]))
     expect(filter.mediaType).toEqual('movie')
-    ;['season', 'episode'].forEach(key => expect(filter[key]).toBeNull())
+    ;['season', 'episode'].forEach((key) => expect(filter[key]).toBeNull())
   })
 
   test('find-comedy-movie-saving', () => {
@@ -33,8 +33,8 @@ describe('Seach and Display Results', () => {
       'Saving Silverman',
     ])
     expect(filter.genres).toEqual(['Comedy', 'Comedy drama', 'Musical comedy', 'Romantic comedy'])
-    ;['collections', 'actors', 'roles'].forEach(key => expect(filter[key]).toEqual([]))
+    ;['collections', 'actors', 'roles'].forEach((key) => expect(filter[key]).toEqual([]))
     expect(filter.mediaType).toEqual('movie')
-    ;['season', 'episode'].forEach(key => expect(filter[key]).toBeNull())
+    ;['season', 'episode'].forEach((key) => expect(filter[key]).toBeNull())
   })
 })

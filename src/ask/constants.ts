@@ -18,7 +18,7 @@ const LOCALES: string[] = [
   'es-US',
 ]
 
-const DISTRIBUTION_COUNTRIES: string[] = LOCALES.map(locale => locale.split('-')[1])
+const DISTRIBUTION_COUNTRIES: string[] = LOCALES.map((locale) => locale.split('-')[1])
 
 // const LOCALE_COUNTRY_MAP = {
 //   'en-US': 'en',
