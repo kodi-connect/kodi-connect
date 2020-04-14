@@ -189,7 +189,7 @@ export async function removeDevice(username: string, id: string) {
   return updatedDevices
 }
 
-export async function isUsersDevice(username: string, id: string) {
+export async function isUsersDevice(username: string, id: string): Promise<boolean> {
   const devices = await getDevices(username)
   if (!devices) return false
 
@@ -201,7 +201,7 @@ export async function isUsersDevice(username: string, id: string) {
 export async function storeAlexaSkillMessagingCredentials(
   username: string,
   alexaSkillMessagingCredentials: { clientId: string; clientSecret: string }
-) {
+): Promise<void> {
   await UsersModel.updateOne({ username }, { alexaSkillMessagingCredentials })
 }
 
@@ -212,7 +212,10 @@ export async function getAlexaSkillMessagingCredentials(
   return _.get(user, 'alexaSkillMessagingCredentials', {})
 }
 
-export async function storeAmazonTokens(username: string, amazonTokens: AmazonTokens) {
+export async function storeAmazonTokens(
+  username: string,
+  amazonTokens: AmazonTokens
+): Promise<void> {
   await UsersModel.updateOne({ username }, { amazonTokens })
 }
 
