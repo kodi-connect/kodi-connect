@@ -2,8 +2,7 @@ import qs from 'querystring'
 import { Router } from 'express'
 import { wrapAsync } from '../util/api'
 import { accessTokenRequest, accessTokenValid, transformAccessTokenData } from '../ask/api'
-import { addSkill, deleteSkill, getSkill, getSkillCredentials } from '../ask'
-import { storeAlexaSkillMessagingCredentials } from '../users'
+import { addSkill, deleteSkill, getSkill, finalizeSkill } from '../ask'
 import config from '../config'
 import createLogger from '../logging'
 
@@ -23,16 +22,17 @@ router.get(
 
     const skill = await getSkill(req.session.lwaCredentials)
 
-    const vars = {}
+    const vars: { skillId?: string; lambdaArn?: boolean } = {}
 
     if (skill) {
-      logger.info('Skill', { skill })
-      const { skillId } = skill
+      vars.skillId = skill.skillId
 
-      vars.skillId = skillId
-
-      const skillCredentials = await getSkillCredentials(req.session.lwaCredentials, skillId)
-      logger.info('skillCredentials', { skillCredentials })
+      vars.lambdaArn =
+        skill.manifest &&
+        skill.manifest.apis &&
+        skill.manifest.apis.video &&
+        skill.manifest.apis.video.endpoint &&
+        skill.manifest.apis.video.endpoint.uri
     }
 
     res.render('alexa-skill', vars)
@@ -41,6 +41,28 @@ router.get(
 
 router.post(
   '/create',
+  wrapAsync(async (req, res) => {
+    if (!req.session.lwaCredentials || !accessTokenValid(req.session.lwaCredentials.expires_at)) {
+      res.redirect('/alexa-skill/lwa')
+      return
+    }
+
+    logger.info('Creating skill')
+
+    const skill = await getSkill(req.session.lwaCredentials)
+
+    if (skill) {
+      await deleteSkill(req.session.lwaCredentials, skill.skillId)
+    }
+
+    await addSkill(req.session.lwaCredentials)
+
+    res.redirect('/alexa-skill')
+  })
+)
+
+router.post(
+  '/update',
   wrapAsync(async (req, res) => {
     if (!req.session.lwaCredentials || !accessTokenValid(req.session.lwaCredentials.expires_at)) {
       res.redirect('/alexa-skill/lwa')
@@ -57,23 +79,13 @@ router.post(
 
     logger.info('Creating skill', { lambdaArn })
 
-    const skillId = await addSkill(req.session.lwaCredentials, lambdaArn)
-
-    try {
-      const skillCredentials = await getSkillCredentials(req.session.lwaCredentials, skillId)
-
-      const { skillMessagingCredentials } = skillCredentials
-      await storeAlexaSkillMessagingCredentials(
-        req.session.user.username,
-        skillMessagingCredentials
-      )
-    } catch (error) {
-      logger.error('Failed to store alexa skill messaging credentials', {
-        originalError: error,
-        skillId,
-      })
-      await deleteSkill(req.session.lwaCredentials, skillId)
+    const skill = await getSkill(req.session.lwaCredentials)
+    if (!skill) {
+      throw new Error("Skill doesn't exist")
     }
+
+    const { skillId } = skill
+    await finalizeSkill(req.session.lwaCredentials, skillId, lambdaArn)
 
     res.redirect('/alexa-skill')
   })

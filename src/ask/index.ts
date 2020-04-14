@@ -1,8 +1,12 @@
-import { ACCOUNT_LINKING, createSkillManifest } from './constants'
+import {
+  ACCOUNT_LINKING,
+  createSkillManifest,
+  createEmptySkillManifest,
+  SKILL_NAME,
+} from './constants'
 import createLogger from '../logging'
 import { askRequest } from './api'
 import { sleep } from '../util/time'
-import { BugsnagError } from '../errors'
 
 const logger = createLogger('ask')
 
@@ -23,7 +27,7 @@ export async function getVendors(lwaCredentials: Record<string, any>) {
 
 export async function getVendorId(lwaCredentials: Record<string, any>): Promise<string> {
   const vendors = await getVendors(lwaCredentials)
-  const vendor = vendors.find(v => v.roles.includes('ROLE_ADMINISTRATOR'))
+  const vendor = vendors.find((v) => v.roles.includes('ROLE_ADMINISTRATOR'))
   if (!vendor) {
     logger.error('Vendor ID not found', { vendors })
     throw new Error('Vendor ID not found')
@@ -80,7 +84,21 @@ export async function getSkill(
   lwaCredentials: Record<string, any>
 ): Promise<Record<string, any> | null | undefined> {
   const skills = await getSkills(lwaCredentials)
-  const skill = skills.find(s => s.apis.includes('video') && s.nameByLocale['en-US'] === 'Kodi')
+  for (const skill of skills) {
+    console.log(skill)
+    // if (skill.nameByLocale == null) {
+    //   console.log('INVALID SKILL', skill)
+    //   // deleteSkill(lwaCredentials, skill.skillId)
+    // }
+  }
+  const skill = skills.find(
+    (s) =>
+      s &&
+      s.apis &&
+      s.apis.includes('video') &&
+      s.nameByLocale &&
+      s.nameByLocale['en-US'] === SKILL_NAME
+  )
   if (!skill) return null
 
   const { skillId } = skill
@@ -119,9 +137,6 @@ export async function getSkillCredentials(lwaCredentials: Record<string, any>, s
     const response = await askRequest(lwaCredentials, {
       method: 'GET',
       path: `/v1/skills/${skillId}/credentials`,
-      params: {
-        resource: 'manifest',
-      },
     })
 
     return response.data
@@ -138,9 +153,9 @@ async function waitForSkillCreation(
   lwaCredentials: Record<string, any>,
   skillId: string,
   seconds = 30
-) {
+): Promise<void> {
   logger.info('waitForSkillCreation', { skillId, seconds })
-  for (let i = 0; i < seconds; i += 1) {
+  for (let i = 0; i < seconds; i += 5) {
     await sleep(5000)
     const { status, errors } = await getSkillStatus(lwaCredentials, skillId)
     switch (status) {
@@ -160,15 +175,15 @@ async function waitForSkillCreation(
   throw Error('Skill creation timeout')
 }
 
-async function createSkill(lwaCredentials: Record<string, any>, lambdaArn: string) {
-  logger.info('createSkill')
+export async function createEmptySkill(lwaCredentials: Record<string, any>): Promise<string> {
+  logger.info('createEmptySkill')
   const vendorId = await getVendorId(lwaCredentials)
   try {
     const response = await askRequest(lwaCredentials, {
       method: 'POST',
       path: '/v1/skills',
       data: {
-        manifest: createSkillManifest(lambdaArn),
+        manifest: createEmptySkillManifest(),
         vendorId,
       },
     })
@@ -183,7 +198,53 @@ async function createSkill(lwaCredentials: Record<string, any>, lambdaArn: strin
   }
 }
 
-async function updateAccountLinking(lwaCredentials: Record<string, any>, skillId: string) {
+async function waitForSkillUpdateDone(
+  lwaCredentials: Record<string, any>,
+  seconds = 30
+): Promise<void> {
+  logger.info('waitForSkillUpdateDone', { seconds })
+  for (let i = 0; i < seconds; i += 5) {
+    await sleep(5000)
+    const skill = await getSkill(lwaCredentials)
+    if (
+      skill.manifest &&
+      skill.manifest.apis &&
+      skill.manifest.apis.video &&
+      skill.manifest.apis.video.endpoint
+    ) {
+      return
+    }
+  }
+
+  logger.error('Skill update timeout')
+  throw Error('Skill update timeout')
+}
+
+async function updateSkill(
+  lwaCredentials: Record<string, any>,
+  skillId: string,
+  lambdaArn: string
+): Promise<void> {
+  logger.info('updateSkill', { skillId, lambdaArn })
+  try {
+    await askRequest(lwaCredentials, {
+      method: 'PUT',
+      path: `/v1/skills/${skillId}/stages/development/manifest`,
+      data: { manifest: createSkillManifest(lambdaArn) },
+    })
+  } catch (error) {
+    logger.error('Update Skill failed', {
+      originalError: error,
+      responseData: error.response && error.response.data,
+    })
+    throw Error('Update Skill failed')
+  }
+}
+
+async function updateAccountLinking(
+  lwaCredentials: Record<string, any>,
+  skillId: string
+): Promise<void> {
   logger.info('updateAccountLinking', { skillId })
   try {
     await askRequest(lwaCredentials, {
@@ -202,7 +263,10 @@ async function updateAccountLinking(lwaCredentials: Record<string, any>, skillId
   }
 }
 
-export async function deleteSkill(lwaCredentials: Record<string, any>, skillId: string) {
+export async function deleteSkill(
+  lwaCredentials: Record<string, any>,
+  skillId: string
+): Promise<void> {
   logger.info('deleteSkill', { skillId })
   try {
     await askRequest(lwaCredentials, {
@@ -215,15 +279,37 @@ export async function deleteSkill(lwaCredentials: Record<string, any>, skillId: 
   }
 }
 
-export async function addSkill(
-  lwaCredentials: Record<string, any>,
-  lambdaArn: string
-): Promise<string> {
+export async function addSkill(lwaCredentials: Record<string, any>): Promise<string> {
   logger.info('addSkill')
   let skillId
   try {
-    skillId = await createSkill(lwaCredentials, lambdaArn)
+    skillId = await createEmptySkill(lwaCredentials)
     await waitForSkillCreation(lwaCredentials, skillId)
+  } catch (error) {
+    try {
+      if (skillId) await deleteSkill(lwaCredentials, skillId)
+    } catch (deleteError) {
+      logger.error('Failed to cleanup hanging skill', {
+        originalError: deleteError,
+        skillId,
+        responseData: error.response && error.response.data,
+      })
+    }
+    throw error
+  }
+
+  return skillId
+}
+
+export async function finalizeSkill(
+  lwaCredentials: Record<string, any>,
+  skillId: string,
+  lambdaArn: string
+): Promise<string> {
+  logger.info('finalizeSkill', { skillId, lambdaArn })
+  try {
+    await updateSkill(lwaCredentials, skillId, lambdaArn)
+    await waitForSkillUpdateDone(lwaCredentials)
     await updateAccountLinking(lwaCredentials, skillId)
   } catch (error) {
     try {
