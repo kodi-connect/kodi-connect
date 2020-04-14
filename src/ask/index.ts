@@ -84,13 +84,6 @@ export async function getSkill(
   lwaCredentials: Record<string, any>
 ): Promise<Record<string, any> | null | undefined> {
   const skills = await getSkills(lwaCredentials)
-  for (const skill of skills) {
-    console.log(skill)
-    // if (skill.nameByLocale == null) {
-    //   console.log('INVALID SKILL', skill)
-    //   // deleteSkill(lwaCredentials, skill.skillId)
-    // }
-  }
   const skill = skills.find(
     (s) =>
       s &&

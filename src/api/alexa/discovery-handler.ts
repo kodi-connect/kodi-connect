@@ -27,13 +27,13 @@ async function getDevices(
   username: string,
   kodiInstances: KodiInstances
 ) {
-  const devices = (await users.getDevices(username)).map(d => _.pick(d, ['id', 'name']))
+  const devices = (await users.getDevices(username)).map((d) => _.pick(d, ['id', 'name']))
   logger.info('Devices', { username, devices })
 
-  const connectedDevices = devices.filter(device => kodiInstances[device.id])
+  const connectedDevices = devices.filter((device) => kodiInstances[device.id])
 
   const devicesWithCapabilities = await Promise.all(
-    connectedDevices.map(async device => {
+    connectedDevices.map(async (device) => {
       try {
         const { capabilities } = await kodiInstances[device.id].rpc({ type: 'capabilities' })
         return { ...device, capabilities: capabilities || LEGACY_CAPABILITIES }
@@ -63,7 +63,7 @@ export default async function discoveryHandler(
   if (_.get(event, 'directive.header.name') === 'Discover') {
     const devices = await getDevices(event, username, kodiInstances)
 
-    const endpoints = devices.map(device => ({
+    const endpoints = devices.map((device) => ({
       capabilities: device.capabilities,
       endpointId: device.id,
       description: "Device description that's shown to the customer",

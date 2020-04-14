@@ -23,7 +23,7 @@ export function getEventAndFilter(
 
 export function connectMongoose(): Promise<void> {
   return new Promise((resolve, reject) => {
-    mongoose.connect(config.mongoConnectString, error => {
+    mongoose.connect(config.mongoConnectString, (error) => {
       if (error) reject(error)
       else resolve()
     })
@@ -32,7 +32,7 @@ export function connectMongoose(): Promise<void> {
 
 export function closeMongoose(): Promise<void> {
   return new Promise((resolve, reject) => {
-    mongoose.disconnect(error => {
+    mongoose.disconnect((error) => {
       if (error) reject(error)
       else resolve()
     })

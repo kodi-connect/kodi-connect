@@ -25,7 +25,7 @@ export default function createTunnelServer(
       logger.debug('kodi disconnected', { code, reason })
     })
 
-    ws.on('error', error => {
+    ws.on('error', (error) => {
       logger.debug('Websocket error', { error })
     })
 
@@ -39,7 +39,7 @@ export default function createTunnelServer(
     }
 
     getDevice(username, secret).then(
-      deviceId => {
+      (deviceId) => {
         logger.info('Device found', { username, deviceId })
         if (!deviceId) {
           ws.close()
@@ -61,7 +61,7 @@ export default function createTunnelServer(
           delete kodiInstances[deviceId]
         })
       },
-      error => {
+      (error) => {
         logger.error('Failed to get device', { username, originalError: error })
         ws.close()
       }
@@ -170,7 +170,7 @@ export function asyncKodiRpcCommand(
   commandType: CommandType,
   additionalData?: Record<string, any>
 ) {
-  kodiRpcCommand(kodiInstances, username, deviceId, commandType, additionalData).catch(error =>
+  kodiRpcCommand(kodiInstances, username, deviceId, commandType, additionalData).catch((error) =>
     logger.error('Kodi RPC Command failed', {
       originalError: error,
       username,

@@ -44,7 +44,7 @@ export default function createTunnel(username: string, deviceId: string, ws: any
     if (msg.ping === 'pong') return
 
     if (msg.async === true) {
-      asyncMessageHandler(username, deviceId, msg.data).catch(error => {
+      asyncMessageHandler(username, deviceId, msg.data).catch((error) => {
         logger.error('Async message handler failed', { originalError: error })
         ws.close()
       })

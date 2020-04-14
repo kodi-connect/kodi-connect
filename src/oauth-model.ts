@@ -71,7 +71,7 @@ export async function getAccessToken(bearerToken: string) {
  */
 const customRedirectUris =
   (process.env.CUSTOM_REDIRECT_URI && [process.env.CUSTOM_REDIRECT_URI]) || []
-const customRedirectUrisRegex = customRedirectUris.map(uri => RegExp(uri))
+const customRedirectUrisRegex = customRedirectUris.map((uri) => RegExp(uri))
 
 export async function getClient(clientId: string, clientSecret: string) {
   // return OAuthClientsModel.findOne({ clientId: clientId, clientSecret: clientSecret }).lean();
@@ -100,7 +100,7 @@ export async function validateRedirectUri(redirectUri: string) {
     ...customRedirectUrisRegex,
   ]
 
-  return REDIRECT_URI_REGEX.some(regex => regex.test(redirectUri))
+  return REDIRECT_URI_REGEX.some((regex) => regex.test(redirectUri))
 }
 
 /**
