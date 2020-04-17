@@ -35,7 +35,7 @@ function logBugsnag(severity: SeverityType, message: string, data: Record<string
         message,
       },
     },
-    e => {
+    (e) => {
       // eslint-disable-next-line no-console
       if (e) console.error(`Bugsnag notify failed ${e.message}`)
     }
@@ -52,7 +52,7 @@ function createLogFn(level: SeverityType, moduleName: string): LoggerFunctionTyp
     const dataMessage = [
       `level="${level}"`,
       `module="${moduleName}"`,
-      ...Object.keys(data).map(key => {
+      ...Object.keys(data).map((key) => {
         switch (key) {
           case 'error':
             return `errorMessage="${data[key].message}" errorStack="${data[key].stack}"`

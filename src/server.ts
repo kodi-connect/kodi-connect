@@ -26,7 +26,7 @@ mongoose.set('debug', true)
 export default function createServer() {
   const MongoStore = connectMongo(session)
 
-  mongoose.connect(config.mongoConnectString, error => {
+  mongoose.connect(config.mongoConnectString, (error) => {
     if (error) {
       logger.error('ERROR connecting to MongoDB', { originalError: error })
     } else {

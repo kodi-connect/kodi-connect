@@ -1,6 +1,8 @@
 import config from '../config'
 import { AwsAlexaGatewayRegion, AwsRegion } from '../types'
 
+export const SKILL_NAME = 'Kodi'
+
 const LOCALES: string[] = [
   'en-US',
   'en-GB',
@@ -18,7 +20,7 @@ const LOCALES: string[] = [
   'es-US',
 ]
 
-const DISTRIBUTION_COUNTRIES: string[] = LOCALES.map(locale => locale.split('-')[1])
+const DISTRIBUTION_COUNTRIES: string[] = LOCALES.map((locale) => locale.split('-')[1])
 
 // const LOCALE_COUNTRY_MAP = {
 //   'en-US': 'en',
@@ -51,7 +53,7 @@ export const REGION_GATEWAY_MAP: {
   sa: 'eu',
 }
 
-export function createSkillManifest(lambdaArn: string) {
+export function createEmptySkillManifest() {
   return {
     publishingInformation: {
       locales: LOCALES.reduce(
@@ -61,7 +63,7 @@ export function createSkillManifest(lambdaArn: string) {
             summary: 'Control Kodi with your voice',
             examplePhrases: ['Alexa, Play Interstellar', 'Alexa, Next', 'Alexa, Previous'],
             keywords: ['kodi', 'xbmc'],
-            name: 'Kodi',
+            name: SKILL_NAME,
             smallIconUri:
               'https://github.com/kodi-connect/kodi-alexa-video/raw/master/icons/kodi-alexa-small.png',
             description:
@@ -86,7 +88,53 @@ export function createSkillManifest(lambdaArn: string) {
           (acc, locale) => ({
             ...acc,
             [locale]: {
-              videoProviderTargetingNames: ['Kodi'],
+              videoProviderTargetingNames: [SKILL_NAME],
+            },
+          }),
+          {}
+        ),
+      },
+    },
+    manifestVersion: '1.0',
+  }
+}
+
+export function createSkillManifest(lambdaArn: string) {
+  return {
+    publishingInformation: {
+      locales: LOCALES.reduce(
+        (acc, locale) => ({
+          ...acc,
+          [locale]: {
+            summary: 'Control Kodi with your voice',
+            examplePhrases: ['Alexa, Play Interstellar', 'Alexa, Next', 'Alexa, Previous'],
+            keywords: ['kodi', 'xbmc'],
+            name: SKILL_NAME,
+            smallIconUri:
+              'https://github.com/kodi-connect/kodi-alexa-video/raw/master/icons/kodi-alexa-small.png',
+            description:
+              'Connects your Kodi devices with Alexa, allowing you to control it with your voice.\n' +
+              'Play and display movies by name, genre, actors, etc.\n' +
+              'Play tv shows by episodes, or by next unwatched episode.\n' +
+              'Control playback (pause, resume, fast forward, etc.)',
+            largeIconUri:
+              'https://github.com/kodi-connect/kodi-alexa-video/raw/master/icons/kodi-alexa.png',
+          },
+        }),
+        {}
+      ),
+      isAvailableWorldwide: false,
+      testingInstructions: 'TODO',
+      category: 'SMART_HOME',
+      distributionCountries: DISTRIBUTION_COUNTRIES,
+    },
+    apis: {
+      video: {
+        locales: LOCALES.reduce(
+          (acc, locale) => ({
+            ...acc,
+            [locale]: {
+              videoProviderTargetingNames: [SKILL_NAME],
             },
           }),
           {}

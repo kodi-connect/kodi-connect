@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 import createLogger from '../logging'
 
-const logger = createLogger('utils')
+const logger = createLogger('api')
 
 export class ApiError extends Error {
   status: number
@@ -33,7 +33,7 @@ export function wrapAsync(handler: Function) {
         if (timedOut) return
         clearTimeout(timerId)
       },
-      error => {
+      (error) => {
         logger.error('Request failed', { originalError: error })
         if (timedOut) return
         clearTimeout(timerId)
@@ -60,7 +60,7 @@ export function wrapAsyncMiddleware(handler: Function) {
         if (timedOut) return
         clearTimeout(timerId)
       },
-      error => {
+      (error) => {
         logger.error('Request middleware failed', { originalError: error })
         if (timedOut) return
         clearTimeout(timerId)

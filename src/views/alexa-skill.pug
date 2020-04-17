@@ -10,11 +10,18 @@ block content
 
     if !skillId
         form(method='POST' action='/alexa-skill/create')
-            input.pt-input(type='search' name='lambda_arn' placeholder='Lambda ARN' dir='auto')
             button.pt-button(type='submit' name='create') Create skill
 
     if skillId
         p Skill ID: #{skillId}
+
+        if !lambdaArn
+            form(method='POST' action='/alexa-skill/update')
+                input.pt-input(type='search' name='lambda_arn' placeholder='Lambda ARN' dir='auto')
+                button.pt-button(type='submit' name='update') Link Lambda
+        
+        if lambdaArn
+            p Skill lambda ARN: #{lambdaArn}
 
         form(method='POST' action='/alexa-skill/delete')
             button.pt-button(type='submit' name='delete') Delete skill
