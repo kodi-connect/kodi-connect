@@ -193,7 +193,7 @@ export async function createEmptySkill(lwaCredentials: Record<string, any>): Pro
 
 async function waitForSkillUpdateDone(
   lwaCredentials: Record<string, any>,
-  seconds = 30
+  seconds = 60
 ): Promise<void> {
   logger.info('waitForSkillUpdateDone', { seconds })
   for (let i = 0; i < seconds; i += 5) {
