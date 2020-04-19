@@ -26,7 +26,7 @@ export function wrapAsync(handler: Function) {
     const timerId = setTimeout(() => {
       timedOut = true
       res.status(500).json({ error: 'Timed out' })
-    }, 30000)
+    }, 60000)
 
     p.then(
       () => {
@@ -53,7 +53,7 @@ export function wrapAsyncMiddleware(handler: Function) {
     const timerId = setTimeout(() => {
       timedOut = true
       res.status(500).json({ error: 'Timed out' })
-    }, 30000)
+    }, 60000)
 
     p.then(
       () => {
