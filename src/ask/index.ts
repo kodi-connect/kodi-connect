@@ -193,12 +193,13 @@ export async function createEmptySkill(lwaCredentials: Record<string, any>): Pro
 
 async function waitForSkillUpdateDone(
   lwaCredentials: Record<string, any>,
-  seconds = 60
+  seconds = 50
 ): Promise<void> {
   logger.info('waitForSkillUpdateDone', { seconds })
+  let skill
   for (let i = 0; i < seconds; i += 5) {
     await sleep(5000)
-    const skill = await getSkill(lwaCredentials)
+    skill = await getSkill(lwaCredentials)
     if (
       skill.manifest &&
       skill.manifest.apis &&
@@ -209,7 +210,7 @@ async function waitForSkillUpdateDone(
     }
   }
 
-  logger.error('Skill update timeout')
+  logger.error('Skill update timeout', { skill })
   throw Error('Skill update timeout')
 }
 
