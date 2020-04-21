@@ -33,7 +33,7 @@
     "promisify-any": "2.0.1",
     "pug": "^2.0.0-rc.4",
     "rand-token": "^1.0.1",
-    "statuses": "1.5.0",
+    "statuses": "2.0.0",
     "type-is": "1.6.18",
     "uuid": "^7.0.3",
     "ws": "^7.2.3",
