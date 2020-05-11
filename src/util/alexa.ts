@@ -1,7 +1,7 @@
 // TODO - extract code to a submodule, and reuse in kodi-alexa-video as well
 
 import _ from 'lodash'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import axios from 'axios'
 
 import config from '../config'
