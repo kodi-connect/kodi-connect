@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 import createLogger from './logging'
 import asyncMessageHandler from './async-message-handler'

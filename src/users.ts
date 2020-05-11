@@ -2,7 +2,7 @@ import _ from 'lodash'
 import mongoose, { Schema } from 'mongoose'
 import randtoken from 'rand-token'
 import nodemailer from 'nodemailer'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import bcrypt from 'bcryptjs'
 
 import config from './config'
