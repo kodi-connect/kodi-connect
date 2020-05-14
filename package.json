@@ -28,7 +28,7 @@
     "express": "^4.16.2",
     "express-session": "^1.17.1",
     "lodash": "^4.17.15",
-    "mongoose": "^5.9.13",
+    "mongoose": "^5.9.14",
     "nodemailer": "^6.4.6",
     "promisify-any": "2.0.1",
     "pug": "^2.0.0-rc.4",
