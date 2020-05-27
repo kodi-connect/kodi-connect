@@ -31,7 +31,7 @@
     "mongoose": "^5.9.16",
     "nodemailer": "^6.4.6",
     "promisify-any": "2.0.1",
-    "pug": "^2.0.0-rc.4",
+    "pug": "^3.0.0",
     "rand-token": "^1.0.1",
     "statuses": "2.0.0",
     "type-is": "1.6.18",
