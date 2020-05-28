@@ -40,7 +40,7 @@
     "yup": "^0.29.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.10.0",
+    "@babel/cli": "^7.10.1",
     "@babel/core": "^7.10.1",
     "@babel/preset-env": "^7.10.0",
     "@babel/preset-typescript": "^7.9.0",
