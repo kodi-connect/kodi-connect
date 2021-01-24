@@ -17,7 +17,7 @@
   "dependencies": {
     "@aws-sdk/client-lambda-node": "^0.1.0-preview.1",
     "ajv": "^6.12.6",
-    "aws-sdk": "^2.828.0",
+    "aws-sdk": "^2.831.0",
     "axios": "^0.21.1",
     "basic-auth": "2.0.1",
     "bcryptjs": "^2.4.3",
